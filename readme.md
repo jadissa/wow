@@ -1,0 +1,1 @@
+my settings for warcraft
