@@ -1,0 +1,22 @@
+## Author: fórsákén
+## X-Realm: Emerald Dream
+## X-Website: https://github.com/jadissa/wow/_retail_/vars
+
+## DefaultState: enabled
+## SavedVariables: persistence
+
+## Title: vars
+## Notes: Manages CVar Data
+## X-Category: System
+# /run print((select(4, GetBuildInfo())));
+## X-Version: 80205
+## Interface: 80205
+
+# Includes
+libs\AceDB-3.0\AceDB-3.0.xml
+libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\utility\utility.lua
+
+# boot
+vars.lua
