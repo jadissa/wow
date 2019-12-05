@@ -305,7 +305,8 @@ function ui:updateStats( f, vars_count, tracked_count, message )
     local t = frames:createText(
       f, 
       nil,
-      vars[ 'theme' ][ 'font' ][ 'small' ] 
+      vars[ 'theme' ][ 'font' ][ 'small' ],
+      'warn' 
     )
     t:SetPoint( 'topleft', f[ 'updates' ], 'topleft', 10, -5 )
     ui[ 'registry'][ 'stats' ][ 'message' ] = t
@@ -341,7 +342,7 @@ function ui:updateStats( f, vars_count, tracked_count, message )
       'Tracking:', 
       vars[ 'theme' ][ 'font' ][ 'small' ] 
     )
-    tracked_label:SetPoint( 'topleft', found_label, 'topleft', -( ( found_label:GetWidth( ) + found_label:GetWidth( ) ) + 50 ), 0 )
+    tracked_label:SetPoint( 'topleft', found_label, 'topleft', -( ( found_label:GetWidth( ) + found_label:GetWidth( ) ) + 25 ), 0 )
     local tracked_count = frames:createText( 
       f, 
       nil, 
