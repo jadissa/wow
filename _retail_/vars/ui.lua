@@ -13,6 +13,7 @@ local list = { }
 -- returns void
 function ui:init( )
   self:RegisterChatCommand( 'vars', 'processInput' )
+  self[ 'registry'] = { }
 end
 
 -- process slash commands
@@ -69,8 +70,8 @@ function ui:createMenu( )
   frame = frames:bootUI( )
 
   -- initialize
-  list[ 'count' ] = 0
-  list[ 'tracked' ] = 0
+  self[ 'registry' ][ 'vars_count' ] = 0
+  self[ 'registry' ][ 'tracked_count' ] = 0
   local direction = 'desc'
   local category = 'Game'
   local state = 'default'
@@ -168,14 +169,13 @@ function ui:createMenu( )
   vv:SetPoint( 'topleft', s, 'topright', 5, 0 )
 
   -- list iterate
-  frame[ 'registry'] = { }
-  frame[ 'registry'][ 'possible_mouseovers' ] = { }
+  self[ 'registry'][ 'possible_mouseovers' ] = { }
   for category, category_data in pairs( t ) do
   	for i, row in pairs( category_data ) do
 
       -- track mouseover possibilities
       -- https://www.wowinterface.com/forums/showthread.php?t=46017
-      frame[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ] = { 
+      ui[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ] = { 
         var   = nil,
         state = nil,
         value = nil,
@@ -184,7 +184,7 @@ function ui:createMenu( )
 
       -- describe var
       local c = frames:createText( frame[ 'containers' ][ 1 ], row[ 'command' ] )
-      frame[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ][ 'var' ] = c
+      ui[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ][ 'var' ] = c
 
       c[ 'c_identifier' ] = category .. '|' .. row[ 'command' ]
       c[ 'c_value' ]      = row[ 'command' ]
@@ -193,11 +193,11 @@ function ui:createMenu( )
       c:SetPoint( 'topleft', frame[ 'containers' ][ 1 ], 'topleft', positions[ 'x' ], positions[ 'y' ] )
 
       local t = frames:createText( frame[ 'containers' ][ 1 ], tracked:indicate( row[ 'tracked' ] ) )
-      frame[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ][ 'state' ] = t
+      ui[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ][ 'state' ] = t
 
       t[ 't_identifier' ] = category .. '|' .. row[ 'command' ]
       t[ 't_value' ]      = tracked:indicate( row[ 'tracked' ] )
-      frame[ 'registry'][ t[ 't_identifier' ] ] = t
+      ui[ 'registry'][ t[ 't_identifier' ] ] = t
       t:SetJustifyH( 'left' )
       t:SetSize( 50, 20 )
       t:SetPoint( 'topleft', c, 'topright', 5, 0 )
@@ -206,11 +206,11 @@ function ui:createMenu( )
       s:SetPoint( 'topleft', c, 'bottomleft', 10, 0, 0 )
 
       if row[ 'tracked' ] then
-        list[ 'tracked' ] = list[ 'tracked' ] + 1
+        self[ 'registry' ][ 'tracked_count' ] = self[ 'registry' ][ 'tracked_count' ] + 1
       end
 
       local v = frames:createEditBox( frame[ 'containers' ][ 1 ], row[ 'value' ] )
-      frame[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ][ 'value' ] = v
+      ui[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ][ 'value' ] = v
 
       v[ 'v_identifier' ] = category .. '|' .. row[ 'command' ]
       v[ 'v_value' ]      = row[ 'value' ]
@@ -221,7 +221,7 @@ function ui:createMenu( )
       v:SetFocus( false )
 
       local d = frames:createText( frame[ 'containers' ][ 1 ], row[ 'help' ] or '-' )
-      frame[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ][ 'help' ] = d
+      ui[ 'registry'][ 'possible_mouseovers' ][ category .. '|' .. row[ 'command' ] ][ 'help' ] = d
 
       d[ 'd_identifier' ] = category .. '|' .. row[ 'command' ]
       d[ 'd_value' ]      = row[ 'help' ]
@@ -230,22 +230,19 @@ function ui:createMenu( )
       d:SetPoint( 'topleft', v, 'topright', 5, 0 )
       d:SetNonSpaceWrap( true )
       d:SetMaxLines( 2 )
-
-
+      
       -- handle modification
       v:SetScript( 'OnEnterPressed', function( self )
 
         local i = gsub( self:GetText(), ' ', '' )
         local c, v = strsplit( '|', self[ 'v_identifier' ] )
-        print( 'updated', c, v, 'to', i )
-        
-        local updated = ui:updateConfig( c, v, i, true )
+        local updated = ui:updateConfig( frame, c, v, i, true )
         if updated then
           local dv = vars:getDefault( v )
           if dv and dv == i then
-            frame[ 'registry'][ c .. '|' .. v ]:SetText( 'default' )
+            ui[ 'registry'][ c .. '|' .. v ]:SetText( 'default' )
           elseif dv and dv ~= i then
-            frame[ 'registry'][ c .. '|' .. v ]:SetText( 'modified' )
+            ui[ 'registry'][ c .. '|' .. v ]:SetText( 'modified' )
           end
         end
         self:ClearFocus( )
@@ -261,49 +258,12 @@ function ui:createMenu( )
       -- udpate dynamic data
       positions[ 'y' ]  = positions[ 'y' ] - 25
       list[ category .. '|' .. row[ 'command' ] ] = t
-      list[ 'count' ]   = list[ 'count' ] + 1
+      self[ 'registry' ][ 'vars_count' ]   = self[ 'registry' ][ 'vars_count' ] + 1
 
   	end
   end
 
-  -- list stats
-  local dd = frames:createText( 
-    frame, 
-    'Vars:', 
-    vars[ 'theme' ][ 'font' ][ 'small' ] 
-  )
-  dd:SetPoint( 
-    'bottomright', 
-    frame[ 'updates' ], 
-    'bottomright', 
-    -( 
-      ( 
-        frame[ 'scroll' ][ 'ScrollBar' ]:GetWidth( ) 
-      ) + 10 
-    ), 
-  10 )
-  local dc = frames:createText( 
-    frame, 
-    list[ 'count' ], 
-    vars[ 'theme' ][ 'font' ][ 'small' ], 
-    'info' 
-  )
-  dc:SetPoint( 'topleft', dd, 'topright', 0, 0 )
-  
-  td = frames:createText( 
-    frame, 
-    'Tracking:', 
-    vars[ 'theme' ][ 'font' ][ 'small' ] 
-  )
-  td:SetPoint( 'topleft', dd, 'topleft', -( ( dd:GetWidth( ) + dc:GetWidth( ) ) + 50 ), 0 )
-  -- @todo: make tracked count pull and store from db
-  tc = frames:createText( 
-    frame, 
-    list[ 'tracked' ], 
-    vars[ 'theme' ][ 'font' ][ 'small' ], 
-    'info' 
-  )
-  tc:SetPoint( 'topleft', td, 'topright', 0, 0 )
+  self:updateStats( frame, self[ 'registry' ][ 'vars_count' ], self[ 'registry' ][ 'tracked_count' ], nil )
 
   return frame
 
@@ -312,23 +272,92 @@ end
 -- updates configuration
 --
 -- returns bool
-function ui:updateConfig( cvar_category, cvar_name, cvar_value, reload_graphix )
+function ui:updateConfig( f, cvar_category, cvar_name, cvar_value, reload_graphix )
   
   if not reload_graphix then reload_graphix = false end
 
   local tracked = vars:GetModule( 'tracked' )
   tracked:queueConfig( cvar_category, cvar_name, cvar_value )
-  local updated, text = tracked:applyConfig( reload_graphix )
-  if text ~= nil then
-    local frames = vars:GetModule( 'frames' )
-    local t = frames:createText( frame, text )
-    t:SetPoint( 'topleft', frame[ 'updates' ], 'topleft', 10, -5 )
-    C_Timer.After( 7, function( )
-      t:Hide( )
-    end )
-  end
+
+  local updated, tracked_count, message = tracked:applyConfig( cvar_category, load_graphix )
+  self[ 'registry' ][ 'tracked_count' ] = tracked_count
+  self:updateStats( 
+    f, 
+    self[ 'registry' ][ 'vars_count' ], 
+    self[ 'registry' ][ 'tracked_count' ], 
+    message 
+  )
 
   return updated
+
+end
+
+-- updates stats
+--
+-- returns void
+function ui:updateStats( f, vars_count, tracked_count, message )
+  
+  if not self[ 'registry'][ 'stats' ] then
+    ui[ 'registry'][ 'stats' ] = { }
+    local frames = vars:GetModule( 'frames' )
+
+    -- what happened
+    local t = frames:createText(
+      f, 
+      nil,
+      vars[ 'theme' ][ 'font' ][ 'small' ] 
+    )
+    t:SetPoint( 'topleft', f[ 'updates' ], 'topleft', 10, -5 )
+    ui[ 'registry'][ 'stats' ][ 'message' ] = t
+
+    -- # vars found
+    local found_label = frames:createText( 
+      f, 
+      'Vars:', 
+      vars[ 'theme' ][ 'font' ][ 'small' ] 
+    )
+    found_label:SetPoint( 
+      'bottomright', 
+      f[ 'updates' ], 
+      'bottomright', 
+      -( 
+        ( 
+          f[ 'scroll' ][ 'ScrollBar' ]:GetWidth( ) 
+        ) + 10 
+      ), 
+    10 )
+    local found_count = frames:createText( 
+      f, 
+      nil, 
+      vars[ 'theme' ][ 'font' ][ 'small' ], 
+      'info' 
+    )
+    found_count:SetPoint( 'topleft', found_label, 'topright', 0, 0 )
+    ui[ 'registry'][ 'stats' ][ 'vars_count' ] = found_count
+
+    -- # vars tracked
+    local tracked_label = frames:createText( 
+      f, 
+      'Tracking:', 
+      vars[ 'theme' ][ 'font' ][ 'small' ] 
+    )
+    tracked_label:SetPoint( 'topleft', found_label, 'topleft', -( ( found_label:GetWidth( ) + found_label:GetWidth( ) ) + 50 ), 0 )
+    local tracked_count = frames:createText( 
+      f, 
+      nil, 
+      vars[ 'theme' ][ 'font' ][ 'small' ], 
+      'info' 
+    )
+    tracked_count:SetPoint( 'topleft', tracked_label, 'topright', 0, 0 )
+    ui[ 'registry'][ 'stats' ][ 'tracked_count' ] = tracked_count
+  end
+  self[ 'registry'][ 'stats' ][ 'message' ]:SetText( message )
+  self[ 'registry'][ 'stats' ][ 'message' ]:Show( )
+  C_Timer.After( 7, function( )
+    self[ 'registry'][ 'stats' ][ 'message' ]:Hide( )
+  end )
+  self[ 'registry'][ 'stats' ][ 'vars_count' ]:SetText( vars_count )
+  self[ 'registry'][ 'stats' ][ 'tracked_count' ]:SetText( tracked_count )
 
 end
 

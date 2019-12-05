@@ -137,13 +137,25 @@ end
 
 -- update configuration
 --
--- returns void
-function tracked:applyConfig( reload_gx )
+-- returns bool, number, string
+function tracked:applyConfig( category, reload_gx )
 
-  local text = ''
-  local updated = false
-  local known_vars = self:getConfig( )
-  if known_vars[ 'count' ] == nil then known_vars[ 'count' ] = 0 end
+  local tracked_count = 0
+  local message       = ''
+  local updated       = false
+  local known_vars    = self:getConfig( )
+  for cat, rows in pairs( known_vars ) do
+    if cat == category then
+      if type( rows ) == 'table' then
+        for i, row in pairs( rows ) do
+          if row[ 'tracked' ] then
+            tracked_count = tracked_count + 1
+          end
+        end
+      end
+    end
+  end
+
   for i, pending in pairs( tracked[ 'queue' ] ) do
     for category, data in pairs( pending ) do
       for j, setting in pairs( data ) do
@@ -151,28 +163,24 @@ function tracked:applyConfig( reload_gx )
           if known_vars[ category ][ j ] then
           	local current_value = GetCVar( index )
           	if strlower( tostring( current_value ) ) ~= strlower( tostring( value ) ) then
-              text = index .. ' updated from: ' .. current_value .. ' to: ' .. tostring( value )
+              message = index .. ' updated from: ' .. current_value .. ' to: ' .. tostring( value )
       	  	  if not C_CVar.SetCVar( index, value ) then
-      	  	  	text = 'failed'
+      	  	  	message = 'failed'
       	  	  else
                 local default_value = GetCVarDefault( index )
                 local evaluation = strlower( tostring( value ) ) ~= strlower( tostring( default_value ) )
                 known_vars[ category ][ j ][ 'tracked' ] = evaluation
-                utility:dump( known_vars[ category ][ j ] )
-                print( 'is value set properly?' )
-                if evaluation then
-                  known_vars[ 'count' ] = known_vars[ 'count' ] + 1
-                else
-                  known_vars[ 'count' ] = known_vars[ 'count' ] - 1
+                if not evaluation then
+                  tracked_count = tracked_count - 1
                 end
       	  	  	updated = true
       	  	  end
       	  	else
-      	  		text = 'this setting is already applied'
+      	  		message = 'this setting is already applied'
       	  	end
       	  	tracked[ 'queue' ] = { }
-    	  end
-    	end
+          end
+        end
       end
     end 
   end
@@ -180,7 +188,8 @@ function tracked:applyConfig( reload_gx )
   if reload_gx and updated then 
   	RestartGx( )
   end
-  return updated, text
+  
+  return updated, tracked_count, message
 
 end
 
