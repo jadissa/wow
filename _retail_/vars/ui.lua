@@ -158,6 +158,11 @@ function ui:createMenu( )
     end
   end
 
+  local d = frames:createDropDown(
+    'category', frame, frame[ 'controls' ], 1, tracked:getConfig( ) 
+  )
+  d:SetPoint( 'topright', frame[ 'controls' ], 'topright', -100, -10 )
+
   local s = frames:createText( frame, 'state' )
   s:SetJustifyH( 'left' )
   s:SetSize( 50, 20 )

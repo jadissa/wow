@@ -131,7 +131,7 @@ function vars:getConfig( )
     SkyCloudLOD                               = 200,
 
     -- help FPS
-    projectedtextures                         = 0,
+    projectedtextures                         = 1,
     maxFPS                                    = 60,
     maxFPSBk                                  = 30,
     emphasizeMySpellEffects                   = 0,
@@ -264,16 +264,19 @@ function vars:OnEnable( )
 
   local persistence = self:getDB( )
   if persistence[ 'profile' ] == nil 
-    or persistence[ 'profile' ][ 'registered' ] == nil then
+    or persistence[ 'profile' ][ 'registered' ] == nil 
+    or persistence[ 'profile' ][ 'vars' ] == nil then
 
     self:notify( 'done' )
     persistence[ 'profile' ][ 'registered' ] = true
 
   elseif persistence[ 'profile' ][ 'registered' ] == true then
+    vars:notify( 'running' )
     return
   end
 
   self:Enable( )
   self:init( )
   self:apply( )
+
 end
