@@ -8,25 +8,35 @@ local vars  = LibStub( 'AceAddon-3.0' ):NewAddon( 'vars' )
 
 vars[ 'messenger' ] = _G[ 'DEFAULT_CHAT_FRAME' ]
 vars[ 'theme' ] = {
+  text = {
+    hex = 'ffffff',
+  },
   info = {
     hex = 'ff30f4', 
   },
   warn = {
     hex = 'ffbf00', 
   },
+  font = {
+    family = 'Fonts\\FRIZQT__.TTF',
+    flags = 'OUTLINE, MONOCHROME',
+    large = 14,
+    normal = 10,
+    small = 8,
+  },
 }
-vars[ 'theme' ][ 'info' ][ 'r' ], 
-vars[ 'theme' ][ 'info' ][ 'g' ], 
-vars[ 'theme' ][ 'info' ][ 'b' ] 
-= utility:hex2rgb( vars[ 'theme' ][ 'info' ][ 'hex'] )
-
-vars[ 'theme' ][ 'warn' ][ 'r' ], 
-vars[ 'theme' ][ 'warn' ][ 'g' ], 
-vars[ 'theme' ][ 'warn' ][ 'b' ] 
-= utility:hex2rgb( vars[ 'theme' ][ 'warn' ][ 'hex'] )
 
 local systemv 
 local enduserv
+
+for name, tdata in pairs( vars[ 'theme' ] ) do
+  if name ~= 'font' then
+    vars[ 'theme' ][ name ][ 'r' ], 
+    vars[ 'theme' ][ name ][ 'g' ], 
+    vars[ 'theme' ][ name ][ 'b' ] 
+    = utility:hex2rgb( tdata[ 'hex' ] )
+  end
+end
 
 -- notice message handler
 --
@@ -64,15 +74,10 @@ end
 function vars:vtest( systemv, enduserv )
 
   if enduserv >= systemv then
-
     self[ 'current' ] = true
-  
   else 
-
     self:warn( 'is outdated, an update is required to continue using!' )
-
     self[ 'current' ] = false
-
   end
 
 end
@@ -81,153 +86,110 @@ end
 --
 -- returns bool
 function vars:isOutDated( )
-
   return not self[ 'current' ] == true
-
 end
 
 -- persistence reference
 --
 -- returns table
 function vars:getDB( ) 
-
   return self[ 'db' ]
-
 end
 
--- initializes persistence data
---
--- returns void
-function vars:init( )
-
-  local persistence = self:getDB( )
-  if persistence[ 'profile' ][ 'vars' ] == nil then
-    persistence[ 'profile' ][ 'vars' ] = { }
-  end
-
-  for v, i in pairs( self:getConfig( ) ) do
-    persistence[ 'profile' ][ 'vars' ][ v ] = i
-  end
-
-end
---/script print( GetCVar( 'cameradistancemaxzoomfactor' ) );
--- set/get configuration
+-- persistence reference
 --
 -- returns table
-function vars:getConfig( )
+function vars:getNameSpace( )
+  return self:getDB( )[ 'profile' ]
+end
 
+-- persistence wipe handler
+--
+-- returns table
+function vars:wipeDB( )
+  return self:getDB( ):ResetDB( )
+end
+
+-- types reference
+--
+-- returns table
+function vars:getTypes( )
+  
   return {
-
-    -- turn down BRIGHT nonsense
-    ffxglow                                   = 0,
-    maxlightcount                             = 12,
-    maxlightdist                              = 100,
-
-    -- make the world gloomy AF
-    weatherdensity                            = 3,
-    particledensity                           = 100,
-    farclip                                   = 185,
-    --nearclip                                  = 1300,
-    SkyCloudLOD                               = 200,
-
-    -- help FPS
-    projectedtextures                         = 1,
-    maxFPS                                    = 60,
-    maxFPSBk                                  = 30,
-    emphasizeMySpellEffects                   = 0,
-    ffxDeath                                  = 0,
-    groundEffectDensity                       = 16,
-    shadowmode                                = 0,
-    shadowtexturesize                         = 1024,
-
-    -- make the world mysterious
-    cameradistancemaxzoomfactor               = 1,
-    groundeffectdist                          = 32,
-    FootstepSounds                            = 1,
-
-    -- make the world violent AF
-    violencelevel                             = 5,
-    profanityfilter                           = 0,
-
-    -- don't interrupt me
-    showtoastwindow                           = 0,
-    showToastFriendRequest                    = 0,
-    showToastOffline                          = 0,
-    showToastOnline                           = 0,
-    guildMemberNotify                         = 0,
-    guildShowOffline                          = 0,
-    --guildNewsFilter                           = 125,
-    pendingInviteInfoShown                    = 0,
-    spamFilter                                = 1,
-    --Sound_MusicVolume                         = 0.2,
-    --Sound_AmbienceVolume                      = 0.4,
-    --Sound_DialogVolume                        = 0.3,
-    BlockTrades                               = 1,
-    blockChannelInvites                       = 1,
-    --showGameTips                              = 0,
-    autoClearAFK                              = 1,
-
-    -- dialogs ui
-    friendssmallview                          = 1,
-    useCompactPartyFrames                     = 1, 
-    guildRosterView                           = 'playerStatus',
-    gxMaximize                                = 0,
-    lfgAutoFill                               = 1,
-    lfgAutoJoin                               = 1,
-    wholeChatWindowClickable                  = 1,
-    whisperMode                               = 'inline',
-    findYourselfAnywhere                      = 1,
-    --Outline                                   = nil,
-    nameplateOtherAtBase                      = 0,
-    nameplateOverlapV                         = 0.2,
-    lockActionBars                            = 1,
-    alwaysShowActionBars                      = 1,
-    cameraView                                = 5,
-    cameraPivot                               = 1,
-    minimapTrackedInfov2                      = 229994,
-
-    -- raid
-    raidOptionIsShown                         = 1,
-    raidOptionSortMode                        = 'group',
-    raidOptionDisplayPets                     = 1,
-    --raidFramesDisplayAggroHighlight           = 1,
-    raidFramesDisplayClassColor               = 1,
-    raidFramesDisplayOnlyDispellableDebuffs   = 1,
-    raidFramesDisplayPowerBars                = 1,
-    raidOptionKeepGroupsTogether              = 1,
-    screenEdgeFlash                           = 0,
-    doNotFlashLowHealthWarning                = 1,
-    nameplateGlobalScale                      = 1.0,
-    nameplateSelectedScale                    = 1.2,
-    nameplateShowAll                          = 1,
-    Sound_EnableErrorSpeech                   = 0,
-
-    -- pvp
-    showBattlefieldMinimap                    = 1,
-    showTargetOfTarget                        = 1,
-    showTargetCastbar                         = 1,
-    showArenaEnemyCastbar                     = 1,
-    showArenaEnemyPets                        = 1,
-
-    -- save
-    synchronizeMacros                         = 1,
-    synchronizeConfig                         = 1,
-    synchronizeSettings                       = 1,   
-
+    [ '0' ] = 'Debug',  [ '1' ] = 'Graphics', [ '2' ] = 'Console', 
+    [ '3' ] = 'Combat', [ '4' ] = 'Game',     [ '5' ] = 'Default', 
+    [ '6' ] = 'Net',    [ '7' ] = 'Sound',    [ '8' ] = 'Gm',
+    [ '9' ] = 'Reveal', [ '10' ] = 'None',
   }
 
 end
 
--- apply config
+-- set/get configuration
+-- if it needs to be modified, a copy should be made
+-- keep this copy pristine and in original condition
+--
+-- returns table
+function vars:getConfig( )
+
+  local persistence = self:getNameSpace( )
+  if persistence[ 'vars' ] ~= nil then
+    return persistence[ 'vars' ]
+  end
+
+  local known_vars      = C_Console.GetAllCommands( )
+  local known_types     = self:getTypes( )
+  persistence[ 'vars' ] = { }
+  for i, row in pairs( known_vars ) do
+    if( tonumber( row[ 'commandType' ] ) == 0 ) then
+      local category  = known_types[ tostring( row[ 'category' ] ) ]
+      if persistence[ 'vars' ][ category ] == nil then
+        persistence[ 'vars' ][ category ] = { }
+      end
+      local failed, default = pcall( GetCVarDefault, row[ 'command' ] )
+      if not failed then
+        default = ''
+      end
+
+      tinsert( persistence[ 'vars' ][ category ], { 
+        help            = row['help'],
+        command         = row['command'],
+        category        = row['category'],
+        scriptContents  = row['scriptContents'],
+        commandType     = known_types [ row['commandType'] ],
+        info            = GetCVarInfo( row['command'] ),
+        tracked         = false,
+        value           = default
+        --value           = GetCVar( row[ 'command' ] )
+      } )
+    end
+  end
+  return persistence[ 'vars' ]
+
+end
+
+-- build baseline data
 --
 -- returns void
-function vars:apply( )
+function vars:init( )
+  local known_vars = self:getConfig( )
+end
 
-  for i, v in pairs( self:getDB( )[ 'profile' ][ 'vars' ] ) do
-    SetCVar( i, v )
-  end
-  RestartGx( )
-  self:notify( 'done' )
+-- gets blizzard default value
+-- resets all possible vars
+--
+-- returns mixed
+function vars:getDefault( index )
+  return GetCVarDefault( index ) or false
+end
+
+-- applies blizzard defaults
+--
+-- returns void
+function vars:applyDefaults( )
+
+  DEFAULT_CHAT_FRAME.editBox:SetText( '/cvar_reset' )
+  ChatEdit_SendText( DEFAULT_CHAT_FRAME.editBox, 0 )
+  --ConsoleExec( 'cvar_reset' )
 
 end
 
@@ -237,11 +199,8 @@ end
 function vars:OnInitialize( )
 
   local defaults = { 
-
     profile = { }
-
   }
-
   self[ 'db' ] = LibStub( 'AceDB-3.0' ):New(
     'persistence', defaults, true
   )
@@ -262,21 +221,8 @@ function vars:OnEnable( )
     return
   end
 
-  local persistence = self:getDB( )
-  if persistence[ 'profile' ] == nil 
-    or persistence[ 'profile' ][ 'registered' ] == nil 
-    or persistence[ 'profile' ][ 'vars' ] == nil then
-
-    self:notify( 'done' )
-    persistence[ 'profile' ][ 'registered' ] = true
-
-  elseif persistence[ 'profile' ][ 'registered' ] == true then
-    vars:notify( 'running' )
-    return
-  end
-
   self:Enable( )
+  --self:wipeDB( )
   self:init( )
-  self:apply( )
 
 end

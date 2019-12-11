@@ -9,14 +9,18 @@
 ## Notes: Manages CVar Data
 ## X-Category: System
 # /run print((select(4, GetBuildInfo())));
-## X-Version: 11302
-## Interface: 11302
+## X-Version: 11303
+## Interface: 11303
 
 # Includes
 libs\AceDB-3.0\AceDB-3.0.xml
 libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
 libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConsole-3.0\AceConsole-3.0.xml
 libs\utility\utility.lua
 
 # boot
 vars.lua
+tracked.lua
+frames.lua
+ui.lua
