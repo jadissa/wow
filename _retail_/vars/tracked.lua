@@ -35,9 +35,6 @@ function tracked:getConfig( )
   -- already built
   if persistence[ 'tracked' ] ~= nil then
     return persistence[ 'tracked' ]
-
-  else
-    --vars:notify( 'db reports needing updating. should it?')
   end
 
   -- needs building
@@ -48,7 +45,11 @@ function tracked:getConfig( )
       if persistence[ 'tracked' ][ category ] == nil then
         persistence[ 'tracked' ][ category ] = { }
       end
-      local default_value = GetCVarDefault( row[ 'command' ] )
+      local failed, default = pcall( GetCVarDefault, row[ 'command' ] )
+      if not failed then
+        default = ''
+      end
+      local default_value = default
       local current_value = GetCVar( row[ 'command' ] )
       local evaluation 		= default_value ~= '' and strlower( tostring( current_value ) ) ~= strlower( tostring( default_value ) )
       if evaluation then
@@ -138,7 +139,7 @@ end
 -- update configuration
 --
 -- returns bool, number, string
-function tracked:applyConfig( category, reload_gx )
+function tracked:applyConfig( category )
 
   local tracked_count = 0
   local message       = ''
@@ -184,9 +185,13 @@ function tracked:applyConfig( category, reload_gx )
       end
     end 
   end
-
-  if reload_gx and updated then 
+  
+  local persistence = self:getNameSpace( )
+  if persistence[ 'options' ][ 'reloadgx' ] and updated then 
   	RestartGx( )
+  end
+  if persistence[ 'options' ][ 'reloadui' ] and updated then 
+    ReloadUI( )
   end
   
   return updated, tracked_count, message
@@ -213,9 +218,20 @@ end
 -- returns void
 function tracked:OnInitialize( )
 
-  local defaults = { 
-    profile = { }
-  }
+  local defaults = { }
+  defaults[ 'profile' ] = { }
+  defaults[ 'profile' ][ 'search' ]   = { }
+  defaults[ 'profile' ][ 'options' ]  = { }
+  defaults[ 'profile' ][ 'search' ][ 'category_filter' ]  = 'Game'
+  defaults[ 'profile' ][ 'search' ][ 'staus_filter' ]     = 'all'
+  defaults[ 'profile' ][ 'search' ][ 'search_filter' ]    = nil
+  defaults[ 'profile' ][ 'search' ][ 'sort_direction' ]   = 'asc'
+  defaults[ 'profile' ][ 'search' ][ 'remember' ]         = true
+
+  defaults[ 'profile' ][ 'options' ]  = { }
+  defaults[ 'profile' ][ 'options' ][ 'reloadgx' ]  = true
+  defaults[ 'profile' ][ 'options' ][ 'reloadui' ]  = false
+
   self:_geParenttDB( ):RegisterNamespace(
   	self:GetName( ), defaults
   )

@@ -123,7 +123,7 @@ function frames:bootUI( )
   f[ 'controls' ] = t
 
   local t = f:CreateTexture( nil, 'ARTWORK', nil, 3 )
-  t:SetTexture( 'Interface\\Azerite\\\AzeriteCenterBGGold' )
+  t:SetTexture( 'Interface\\Addons\\vars\\textures\\AzeriteCenterBGGold' )
   t:SetSize( 65, f[ 'controls' ]:GetHeight( ) )
   t:SetVertTile( true )
   t:SetPoint( 'topright', f[ 'controls' ], 'topright', 0, 5 )
@@ -141,7 +141,7 @@ function frames:bootUI( )
   f[ 'browser' ] = t
 
   local t = f:CreateTexture( nil, 'ARTWORK', nil, 3 )
-  t:SetTexture( 'Interface\\Azerite\\\AzeriteCenterBGGold' )
+  t:SetTexture( 'Interface\\Addons\\vars\\textures\\AzeriteCenterBGGold' )
   t:SetSize( 65, f[ 'browser' ]:GetHeight( ) )
   t:SetPoint( 'topright', f[ 'browser' ], 'topright', 0, 0 )
   f[ 'browserart' ] = t
@@ -204,7 +204,6 @@ function frames:createButton( f, text, name )
   b:SetNormalTexture( 'Interface\\Addons\\vars\\textures\\button-normal' )
   b:SetPushedTexture( 'Interface\\Addons\\vars\\textures\\button-pushed' )
   b:SetDisabledTexture( 'Interface\\Addons\\vars\\textures\\button-disabled' )
-  b:SetSize( 128, 32 )
   b:SetText( text )
 
   return b
@@ -239,6 +238,7 @@ end
 -- returns table
 function frames:createEditBox( f, text, name, theme )
 
+  if text == nil then text = '-' end
   if name == nil then name = random( 0, 9999 ) end
   if theme == nil then theme = 'warn' end
   local e = self:createFrame( 'EditBox', name, f )
@@ -346,47 +346,17 @@ end
 -- creates dropdown
 --
 -- returns table
-function frames:createDropDown( name, parent, anchor, level, categories )
+function frames:createDropDown( calling_instance, name, parent, list )
   
   local f = self:createFrame(
     'Frame', name, parent, 'UIDropDownMenuTemplate'
   )
-
-  f[ 'data' ] = { }
-  f[ 'setv' ] = function( f, index, value )
-
-    f[ 'data' ][ index ] = value
-
-  end
-
-  f[ 'getv' ] = function( f, index )
-
-    return f[ 'data' ][ index ] or false
-
-  end
-
-  f:SetBackdropColor( 0, 1, 0, .9 )
-  UIDropDownMenu_SetWidth( f, 125 )
-  UIDropDownMenu_EnableDropDown( f )
-
-  UIDropDownMenu_SetButtonWidth( f, 125 )
-  UIDropDownMenu_JustifyText( f, 'LEFT' )
-
-  local menu_list = { }
-  local i = 1
-  for category, _ in pairs ( categories ) do
-      menu_list[ i ]                = { }
-      menu_list[ i ][ 'checked' ]   = false
-      menu_list[ i ][ 'text' ]      = category
-      i = i + 1
-  end
-
-  f:setv( 'level', level )
-  f:setv( 'menu_list', menu_list )
+  f[ 'calling_instance' ] = calling_instance
+  f[ 'list' ] = list
 
   UIDropDownMenu_Initialize( f, function( self )
 
-    frames:dropdown_initialize( f, self:getv( 'level' ), self:getv( 'menu_list' ) )
+    frames:dropdownInitialize( f, self[ 'list' ], self[ 'calling_instance' ] )
 
   end )
 
@@ -394,44 +364,47 @@ function frames:createDropDown( name, parent, anchor, level, categories )
 
 end
 
-function frames:dropdown_initialize( frame, level, menu_list )
+function frames:dropdownInitialize( frame, list_items, calling_instance )
   
   local list = { }
-  for i, v in pairs( menu_list ) do
-
-    local info = UIDropDownMenu_CreateInfo()
-
-    info[ 'isTitle' ] = v[ 'isTitle' ] or false
-    info[ 'text' ]    = v[ 'text' ]
-    info[ 'value' ]   = v[ 'text' ]
-    info[ 'func' ]    = function( self )
-
-      --jl_cvars:filter_list( info[ 'value' ]  )
-
-      UIDropDownMenu_SetSelectedValue( frame, self[ 'value' ] )
-
-      --menu[ 'scroll' ][ 'ScrollBar' ]:SetValue( 0 )
-      --menu[ 'search'].clearButton:Click()
-
+  local selected_index = 1
+  for i, v in pairs( list_items ) do
+    local b = UIDropDownMenu_CreateInfo()
+    if v[ 'checked' ] == true then
+      selected_index     = i
+      -- @todo: figure out way to uncheck previously checked items
+      -- before re-enabling this
+    else
+      b[ 'checked' ]     = false
     end
-    info[ 'isNotRadio' ]        = true
-    --info[ 'colorCode' ]         = '|cff' .. jl_cvars[ 'theme' ][ 'info' ][ 'hex' ]
-    info[ 'notClickable' ]      = false
-    info[ 'noClickSound' ]      = true
-    list[ i ] = info
+    --b[ 'customFrame' ]   = someframe -- inherits UIDropDownCustomMenuEntryTemplate
+    
+    b[ 'isTitle' ]       = false
+    b[ 'text' ]          = v[ 'text' ]
+    b[ 'value' ]         = v[ 'text' ]
+    b[ 'isNotRadio' ]    = true
+    b[ 'notClickable' ]  = false
+    b[ 'noClickSound' ]  = true
+    b[ 'leftPadding' ]   = nil
+    b[ 'padding' ]       = nil
+    b[ 'justifyH' ]      = nil
+    --b[ 'colorCode' ]   = '|cff' .. vars[ 'theme' ][ 'b' ][ 'hex' ]
+    b[ 'func' ]          = function( self )
 
-    UIDropDownMenu_AddButton( info, level )
+    UIDropDownMenu_SetSelectedValue( frame, self[ 'value' ] )
+    UIDropDownMenu_RefreshAll( frame, self[ 'value' ] )
 
+      -- this is a probably a terrible hack
+      calling_instance:dropdownOnChange( frame )
+    end 
+    list[ i ] = b
+    UIDropDownMenu_AddButton( b )
   end
-
   local selected_value  = UIDropDownMenu_GetSelectedValue( frame )
   if selected_value == nil then
-  
-    UIDropDownMenu_SetSelectedValue( frame, list[ 1 ][ 'value' ] )
-
-    --jl_cvars:filter_list( list[ 1 ][ 'value' ]  )
-
+    UIDropDownMenu_SetSelectedValue( frame, list[ selected_index ][ 'value' ] )
   end
+  UIDropDownMenu_JustifyText( frame, 'LEFT' )
 
 end
 

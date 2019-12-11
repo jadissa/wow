@@ -29,22 +29,14 @@ vars[ 'theme' ] = {
 local systemv 
 local enduserv
 
--- generate theme colors
---
--- returns void
-local function parseTheme( )
-
-  for name, tdata in pairs( vars[ 'theme' ] ) do
-    if name ~= 'font' then
-      vars[ 'theme' ][ name ][ 'r' ], 
-      vars[ 'theme' ][ name ][ 'g' ], 
-      vars[ 'theme' ][ name ][ 'b' ] 
-      = utility:hex2rgb( tdata[ 'hex' ] )
-    end
+for name, tdata in pairs( vars[ 'theme' ] ) do
+  if name ~= 'font' then
+    vars[ 'theme' ][ name ][ 'r' ], 
+    vars[ 'theme' ][ name ][ 'g' ], 
+    vars[ 'theme' ][ name ][ 'b' ] 
+    = utility:hex2rgb( tdata[ 'hex' ] )
   end
-
 end
-parseTheme( )
 
 -- notice message handler
 --
@@ -152,6 +144,10 @@ function vars:getConfig( )
       if persistence[ 'vars' ][ category ] == nil then
         persistence[ 'vars' ][ category ] = { }
       end
+      local failed, default = pcall( GetCVarDefault, row[ 'command' ] )
+      if not failed then
+        default = ''
+      end
       tinsert( persistence[ 'vars' ][ category ], { 
         help            = row['help'],
         command         = row['command'],
@@ -160,7 +156,7 @@ function vars:getConfig( )
         commandType     = known_types [ row['commandType'] ],
         info            = GetCVarInfo( row['command'] ),
         tracked         = false,
-        value           = GetCVarDefault( row[ 'command' ] )
+        value           = default
         --value           = GetCVar( row[ 'command' ] )
       } )
     end
