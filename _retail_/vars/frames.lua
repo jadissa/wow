@@ -73,6 +73,12 @@ function frames:bootUI( )
   f:SetResizable( false )
   f:SetMovable( true )
   f:RegisterForDrag( 'LeftButton' )  
+  local s = frames:getNameSpace( )[ 'scale' ]
+  if s ~= nil then
+    f:SetScale( s )
+  else
+    f:SetScale( 1 )
+  end
   local d = frames:getNameSpace( )[ 'dropzone' ]
   if d ~= nil then
     if d[ 'x' ] ~= nil and d[ 'y' ] ~= nil
@@ -90,11 +96,19 @@ function frames:bootUI( )
   else
     f:SetPoint( 'center', 0, 0 )
   end
+  f[ 'x' ] = f:GetLeft( ) 
+  f[ 'y' ] = ( f:GetTop( ) - f:GetHeight( ) )
+
   f:SetScript( 'OnDragStart', function( self )
+    self[ 'moving' ] = true
     self:StartMoving( )
   end )
+
   f:SetScript( 'OnDragStop', function( self )
+    self[ 'moving' ] = false
     self:StopMovingOrSizing( )
+    self[ 'x' ] = self:GetLeft( ) 
+    self[ 'y' ] = ( self:GetTop( ) - self:GetHeight( ) ) 
     self:SetUserPlaced( true )
     local p, rt, rp, x, y = self:GetPoint( )
     local d = {
@@ -107,15 +121,15 @@ function frames:bootUI( )
     frames:getNameSpace( )[ 'dropzone' ] = d
   end )
 
-  --[[
-  local c = self:createFrame( 'Frame', vars:GetName( ) .. 'Controls', f )
-  c:SetSize( f:GetWidth( ) - 20, 45 )
-  c:SetPoint( 'topleft', f[ 'titlearea' ], 'bottomleft', 5, 0 )
-  local t = c:CreateTexture( nil, 'ARTWORK', nil, 2 )
-  t:SetTexture( 'Interface\\Addons\\vars\\textures\\frame' )
-  t:SetAllPoints( )
-  f[ 'controls' ] = c
-  ]]
+  f:SetScript( 'OnUpdate', function( self ) 
+    if self[ 'moving' ] == true then
+      self[ 'x' ] = self:GetLeft( ) 
+      self[ 'y' ] = ( self:GetTop( ) - self:GetHeight( ) ) 
+    end
+  end )
+
+  local rs = self:createResizer( f )
+
   local t = f:CreateTexture( nil, 'ARTWORK', nil, 2 )
   t:SetTexture( 'Interface\\Addons\\vars\\textures\\frame' )
   t:SetSize( f:GetWidth( ) - 20, 45 )
@@ -152,7 +166,7 @@ function frames:bootUI( )
   u:SetPoint( 'topleft', f[ 'browser' ], 'bottomleft', 0, -5 )
   f[ 'updates' ] = u
 
-  f[ 'scroll' ] = self:createFrame(
+  f[ 'scroll' ] = f[ 'scroll' ] or self:createFrame(
     'ScrollFrame', vars:GetName( ) .. 'Scroll', f, 'UIPanelScrollFrameTemplate' 
   )
   f[ 'scroll' ]:SetPoint( 'topleft', f[ 'browser' ], 'topleft', -25, -2 )
@@ -176,6 +190,47 @@ function frames:bootUI( )
   f:Hide( )
 
   return f
+
+end
+
+-- creates a resizing element
+--
+-- returns table
+function frames:createResizer( f )
+  self[ 'rs' ] = self[ 'rs' ] or self:createFrame( 'Button', 'resize', f )
+  self[ 'rs' ]:SetSize( 16, 16 )
+  self[ 'rs' ]:SetPoint( 'bottomright' )
+  self[ 'rs' ]:SetNormalTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up' )
+  self[ 'rs' ]:SetHighlightTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight' )
+  self[ 'rs' ]:SetPushedTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down' )
+  self[ 'rs' ]:SetScript( 'OnMouseDown', function( self, b )
+    if b == 'LeftButton' then
+      self[ 'scaling' ] = true
+    end
+  end )
+  self[ 'rs' ]:SetScript( 'OnMouseUp', function( self, b )
+    if b == 'LeftButton' then
+      self[ 'scaling' ] = false
+      frames:getNameSpace( )[ 'scale' ] = self:GetParent( ):GetScale( )
+    end
+  end )
+  self[ 'rs' ]:SetScript( 'OnUpdate', function( self, b )
+    if self[ 'scaling' ] == true then
+      local cx, cy = GetCursorPosition( )
+      cx = cx / self:GetEffectiveScale( ) - self:GetParent( ):GetLeft( ) 
+      cy = self:GetParent( ):GetHeight( ) - ( cy / self:GetEffectiveScale( ) - self:GetParent( ):GetBottom( ) )
+
+      local s = cx / self:GetParent( ):GetWidth( )
+      local tx, ty = self:GetParent( ).x / s, self:GetParent( ).y / s
+      
+      self:GetParent( ):ClearAllPoints( )
+      self:GetParent( ):SetScale( self:GetParent( ):GetScale() * s )
+      self:GetParent( ):SetPoint( 'bottomleft', UIParent, 'bottomleft', tx, ty )
+      self:GetParent( ).x, self:GetParent( ).y = tx, ty
+    end
+  end )
+
+  return self[ 'rs' ]
 
 end
 
