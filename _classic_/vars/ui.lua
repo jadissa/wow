@@ -258,7 +258,7 @@ function ui:createMenu( )
   vn:SetSize( 225, 20 )
   vn:SetPoint( 'topleft', self[ 'menu' ][ 'controls' ], 'topleft', 0, -25 )
 
-  local s = frames:createButton( self[ 'menu' ], '^', 'sort' )
+  local s = frames:createButton( self[ 'menu' ], '^', 'sorted' )
   s:SetSize( 10, 10 )
   s:SetPoint( 'topleft', vn, 'topright', 0, 0 )
   s:SetFrameLevel( 5 )

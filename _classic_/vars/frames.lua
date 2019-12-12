@@ -221,12 +221,12 @@ function frames:createResizer( f )
       cy = self:GetParent( ):GetHeight( ) - ( cy / self:GetEffectiveScale( ) - self:GetParent( ):GetBottom( ) )
 
       local s = cx / self:GetParent( ):GetWidth( )
-      local tx, ty = self:GetParent( ).x / s, self:GetParent( ).y / s
+      local tx, ty = self:GetParent( )[ 'x' ] / s, self:GetParent( )[ 'y' ] / s
       
       self:GetParent( ):ClearAllPoints( )
       self:GetParent( ):SetScale( self:GetParent( ):GetScale() * s )
       self:GetParent( ):SetPoint( 'bottomleft', UIParent, 'bottomleft', tx, ty )
-      self:GetParent( ).x, self:GetParent( ).y = tx, ty
+      self:GetParent( )[ 'x' ], self:GetParent( )[ 'y' ] = tx, ty
     end
   end )
 
@@ -254,7 +254,7 @@ end
 function frames:createButton( f, text, name )
 
   if name == nil then name = random( 0, 9999 ) end
-  local b = self:createFrame( 'Button', 'asdf', f, 'UIPanelButtonNoTooltipTemplate' )
+  local b = self:createFrame( 'Button', name, f, 'UIPanelButtonNoTooltipTemplate' )
   b:DisableDrawLayer( 'BACKGROUND' )
   b:SetNormalTexture( 'Interface\\Addons\\vars\\textures\\button-normal' )
   b:SetPushedTexture( 'Interface\\Addons\\vars\\textures\\button-pushed' )

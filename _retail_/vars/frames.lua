@@ -166,7 +166,7 @@ function frames:bootUI( )
   u:SetPoint( 'topleft', f[ 'browser' ], 'bottomleft', 0, -5 )
   f[ 'updates' ] = u
 
-  f[ 'scroll' ] = f[ 'scroll' ] or self:createFrame(
+  f[ 'scroll' ] = self:createFrame(
     'ScrollFrame', vars:GetName( ) .. 'Scroll', f, 'UIPanelScrollFrameTemplate' 
   )
   f[ 'scroll' ]:SetPoint( 'topleft', f[ 'browser' ], 'topleft', -25, -2 )
@@ -197,40 +197,40 @@ end
 --
 -- returns table
 function frames:createResizer( f )
-  self[ 'rs' ] = self[ 'rs' ] or self:createFrame( 'Button', 'resize', f )
-  self[ 'rs' ]:SetSize( 16, 16 )
-  self[ 'rs' ]:SetPoint( 'bottomright' )
-  self[ 'rs' ]:SetNormalTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up' )
-  self[ 'rs' ]:SetHighlightTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight' )
-  self[ 'rs' ]:SetPushedTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down' )
-  self[ 'rs' ]:SetScript( 'OnMouseDown', function( self, b )
+  local rs = self:createFrame( 'Button', 'resize', f )
+  rs:SetSize( 16, 16 )
+  rs:SetPoint( 'bottomright' )
+  rs:SetNormalTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up' )
+  rs:SetHighlightTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight' )
+  rs:SetPushedTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down' )
+  rs:SetScript( 'OnMouseDown', function( self, b )
     if b == 'LeftButton' then
       self[ 'scaling' ] = true
     end
   end )
-  self[ 'rs' ]:SetScript( 'OnMouseUp', function( self, b )
+  rs:SetScript( 'OnMouseUp', function( self, b )
     if b == 'LeftButton' then
       self[ 'scaling' ] = false
       frames:getNameSpace( )[ 'scale' ] = self:GetParent( ):GetScale( )
     end
   end )
-  self[ 'rs' ]:SetScript( 'OnUpdate', function( self, b )
+  rs:SetScript( 'OnUpdate', function( self, b )
     if self[ 'scaling' ] == true then
       local cx, cy = GetCursorPosition( )
       cx = cx / self:GetEffectiveScale( ) - self:GetParent( ):GetLeft( ) 
       cy = self:GetParent( ):GetHeight( ) - ( cy / self:GetEffectiveScale( ) - self:GetParent( ):GetBottom( ) )
 
       local s = cx / self:GetParent( ):GetWidth( )
-      local tx, ty = self:GetParent( ).x / s, self:GetParent( ).y / s
+      local tx, ty = self:GetParent( )[ 'x' ] / s, self:GetParent( )[ 'y' ] / s
       
       self:GetParent( ):ClearAllPoints( )
       self:GetParent( ):SetScale( self:GetParent( ):GetScale() * s )
       self:GetParent( ):SetPoint( 'bottomleft', UIParent, 'bottomleft', tx, ty )
-      self:GetParent( ).x, self:GetParent( ).y = tx, ty
+      self:GetParent( )[ 'x' ], self:GetParent( )[ 'y' ] = tx, ty
     end
   end )
 
-  return self[ 'rs' ]
+  return rs
 
 end
 
@@ -254,7 +254,7 @@ end
 function frames:createButton( f, text, name )
 
   if name == nil then name = random( 0, 9999 ) end
-  local b = self:createFrame( 'Button', 'asdf', f, 'UIPanelButtonNoTooltipTemplate' )
+  local b = self:createFrame( 'Button', name, f, 'UIPanelButtonNoTooltipTemplate' )
   b:DisableDrawLayer( 'BACKGROUND' )
   b:SetNormalTexture( 'Interface\\Addons\\vars\\textures\\button-normal' )
   b:SetPushedTexture( 'Interface\\Addons\\vars\\textures\\button-pushed' )
