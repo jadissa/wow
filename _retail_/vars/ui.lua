@@ -90,11 +90,35 @@ function ui:filterList( )
 
   local t = { }
 
-  local persistence = tracked:getNameSpace( )
-  local category    = persistence[ 'search' ][ 'category_filter' ]
-  local data        = self:dataPreProcess( )
-  local frames      = vars:GetModule( 'frames' )
-  local var_names   = frames:sort( data, persistence[ 'search' ][ 'sort_direction' ] ) 
+  local persistence   = tracked:getNameSpace( )
+  local category      = persistence[ 'search' ][ 'category_filter' ]
+  local search_string = persistence[ 'search' ][ 'text' ]
+  local data          = self:dataPreProcess( )
+  local frames        = vars:GetModule( 'frames' )
+  local var_names     = nil
+
+  if search_string ~= nil then
+    var_names     = tracked:getConfig( )
+  else
+    var_names     = frames:sort( data, persistence[ 'search' ][ 'sort_direction' ] )
+  end
+
+  if search_string ~= nil then
+    for category, category_data in pairs( var_names ) do
+      for o, row in pairs( category_data ) do
+        local s     = strlower( row[ 'command' ] )
+        local i, j  = string.find( s, search_string )
+        if( i ~= nil and i > 0 ) and ( j ~= nil and j > 0 ) then
+          if t[ category ] == nil then
+            t[ category ] = { }
+          end
+          t[ category ][ o ] = row
+        end
+      end
+    end
+
+    return t
+  end
 
   for o, var_name in pairs( var_names ) do
     for cat, category_data in pairs( tracked:getConfig( ) ) do
@@ -252,11 +276,41 @@ function ui:createMenu( )
   local persistence = tracked:getNameSpace( )
   local frames = vars:GetModule( 'frames' )
   self[ 'menu' ] = self[ 'menu' ] or frames:bootUI( )
+
+  self[ 'search'] = self[ 'search'] or frames:createFrame( 'EditBox', 'search_box', self[ 'menu' ], 'BagSearchBoxTemplate' )
+  self[ 'search']:SetSize( 100, 25 )
+  self[ 'search']:SetBackdropColor( 0, 1, 0, .9 )
+  self[ 'search']:SetPoint( 'topleft', self[ 'menu' ][ 'controls' ], 'topleft', 100, -14 )
+  self[ 'search']:SetScript( 'OnTextChanged', function( self )
+    local input_text = self:GetText( )
+    if( string.len( input_text ) >= 3 ) then
+      persistence[ 'search' ][ 'text' ] = strlower( input_text )
+      ui:iterateList( ui:filterList( ) )
+      persistence[ 'search' ][ 'text' ] = nil
+    end
+  end )
+
+  self[ 'search' ]:SetScript( 'OnEditFocusLost', function( self )
+    self[ 'Instructions' ]:Show( )
+    --self:SetAutoFocus( false )
+    self:SetText( '' )
+    persistence[ 'search' ][ 'text' ] = nil
+    C_Timer.After( 1, function( )
+      ui:iterateList( ui:filterList( ) )
+    end )
+
+  end )
+
+  self[ 'search' ]:SetScript( 'OnEditFocusGained', function( self )
+    --self:SetAutoFocus( false )
+    self[ 'Instructions' ]:Hide( )
+    persistence[ 'search' ][ 'text' ] = nil
+  end )
   
   local vn = frames:createText( self[ 'menu' ], 'var' )
   vn:SetJustifyH( 'right' )
-  vn:SetSize( 225, 20 )
-  vn:SetPoint( 'topleft', self[ 'menu' ][ 'controls' ], 'topleft', 0, -25 )
+  vn:SetSize( 25, 20 )
+  vn:SetPoint( 'topleft', self[ 'search'], 'topright', 0, -6 )
 
   local s = frames:createButton( self[ 'menu' ], '^', 'sorted' )
   s:SetSize( 10, 10 )
@@ -303,6 +357,7 @@ function ui:createMenu( )
   end
   local d = frames:createDropDown( self, 'category', self[ 'menu' ], ddl )
   d:SetPoint( 'topleft', vh, 'topright', -15, 8 )
+  self[ 'menu' ][ 'dropdown' ] = d
 
   return self[ 'menu' ]
 
