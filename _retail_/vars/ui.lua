@@ -86,6 +86,9 @@ function ui:dataPreProcess( )
 
 end
 
+-- filters main list via search options
+--
+-- returns table
 function ui:filterList( )
 
   local t = { }
@@ -139,6 +142,9 @@ function ui:filterList( )
 
 end
 
+-- displays filtered list items
+--
+-- returns void
 function ui:iterateList( list )
 
   local positions   = { x = 30, y = 0 }
@@ -363,6 +369,9 @@ function ui:createMenu( )
 
 end
 
+-- dropdown onchange event
+--
+-- returns void
 function ui:dropdownOnChange( dropdown_frame )
   
   local persistence     = tracked:getNameSpace( )

@@ -181,9 +181,9 @@ function frames:bootUI( )
     {
       text = 'Mod'
     },
-    --[[{
+    {
       text = 'Sys'
-    }]]
+    },
   }
   f[ 'containers' ] = self:createTabs( f, tab_names )
 
