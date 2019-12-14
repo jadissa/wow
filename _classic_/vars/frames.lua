@@ -185,7 +185,7 @@ function frames:bootUI( )
       text = 'Sys'
     },]]
   }
-  self:createTabs( f, tab_names )
+  f[ 'containers' ] = self:createTabs( f, tab_names )
 
   f:Hide( )
 
@@ -314,7 +314,7 @@ end
 
 -- creates tabs
 --
--- returns table, table
+-- returns table
 function frames:createTabs( f, tab_names )
 
   f[ 'containers' ] = { }
@@ -354,6 +354,8 @@ function frames:createTabs( f, tab_names )
   end
   self:tabClick( _G[ f:GetName( ) .. 'Tab1' ] )
 
+  return f[ 'containers' ]
+
 end
 
 -- tab click event
@@ -361,8 +363,6 @@ end
 -- returns void
 function frames:tabClick( self )
   PanelTemplates_SetTab( self:GetParent( ), self:GetID( ) )
-
-  --self:GetParent( )[ 'browser' ]:Hide( )
 
   local scroll_child = self:GetParent( )[ 'scroll' ]:GetScrollChild( )
   if scroll_child then
