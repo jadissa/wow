@@ -224,7 +224,7 @@ function tracked:OnInitialize( )
   defaults[ 'profile' ][ 'options' ]  = { }
   defaults[ 'profile' ][ 'search' ][ 'category_filter' ]  = 'Game'
   defaults[ 'profile' ][ 'search' ][ 'staus_filter' ]     = 'all'
-  defaults[ 'profile' ][ 'search' ][ 'search_filter' ]    = nil
+  defaults[ 'profile' ][ 'search' ][ 'text' ]             = nil
   defaults[ 'profile' ][ 'search' ][ 'sort_direction' ]   = 'asc'
   defaults[ 'profile' ][ 'search' ][ 'remember' ]         = true
 
