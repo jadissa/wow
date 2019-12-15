@@ -413,7 +413,7 @@ function frames:tabClick( self )
     self:GetParent( )[ 'controls' ][ 'controlsart' ]:Show( )
     self:GetParent( )[ 'browser' ]:SetSize(
       s[ 'browser' ][ 'w' ], 
-      s[ 'browser' ][ 'h' ]
+      s[ 'browser' ][ 'h' ] - s[ 'controls' ][ 'h' ] + 5
     )
     self:GetParent( )[ 'browser' ]:ClearAllPoints( )
     self:GetParent( )[ 'browser' ]:SetPoint(

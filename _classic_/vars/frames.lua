@@ -50,13 +50,12 @@ end
 function frames:bootUI( )
 
   local f = self:createFrame( 'Frame', vars:GetName( ) .. 'Main', UIParent, 'UIPanelDialogTemplate' )
-
   f:SetFrameStrata( 'DIALOG' )
   f:SetClampedToScreen( true )
   f:SetSize( 700, 400 )
-
   f:DisableDrawLayer( 'OVERLAY' )
   f:DisableDrawLayer( 'BACKGROUND' )
+
   local t = f:CreateTexture( nil, 'ARTWORK', nil, 0 )
   t:SetTexture( 'Interface\\Addons\\vars\\textures\\frame' )
   t:SetAllPoints( f )
@@ -70,9 +69,9 @@ function frames:bootUI( )
 
   f:EnableKeyboard( true )
   f:EnableMouse( true )
-  f:SetResizable( true )
+  f:SetResizable( false )
   f:SetMovable( true )
-  f:RegisterForDrag( 'LeftButton' )
+  f:RegisterForDrag( 'LeftButton' )  
   local s = frames:getNameSpace( )[ 'scale' ]
   if s ~= nil then
     f:SetScale( s )
@@ -128,93 +127,75 @@ function frames:bootUI( )
     end
   end )
 
-  local rs = self:createResizer( f )
-
-  local t = f:CreateTexture( nil, 'ARTWORK', nil, 2 )
+  f[ 'controls' ] = self:createFrame( 'Frame', 'controls', f )
+  f[ 'controls' ]:SetSize( f:GetWidth( ) - 20, 45 )
+  f[ 'controls' ]:SetPoint( 'topleft', f[ 'titlearea' ], 'topleft', 10, -( f[ 'titlearea' ]:GetHeight( ) + 2 ) )
+  local t = f:CreateTexture( nil, 'ARTWORK', nil, 0 )
   t:SetTexture( 'Interface\\Addons\\vars\\textures\\frame' )
-  t:SetSize( f:GetWidth( ) - 20, 45 )
-  t:SetPoint( 'topleft', f, 'topleft', 10, -( f[ 'titlearea' ]:GetHeight( ) + 2 ) )
-  f[ 'controls' ] = t
+  t:SetAllPoints( f[ 'controls' ] )
+  f[ 'controls' ][ 'background' ] = t
 
   local t = f:CreateTexture( nil, 'ARTWORK', nil, 3 )
   t:SetTexture( 'Interface\\Addons\\vars\\textures\\AzeriteCenterBGGold' )
   t:SetSize( 65, f[ 'controls' ]:GetHeight( ) )
   t:SetVertTile( true )
   t:SetPoint( 'topright', f[ 'controls' ], 'topright', 0, 5 )
-  f[ 'controlsart' ] = t
+  f[ 'controls' ][ 'controlsart' ] = t
 
-  local t = f:CreateTexture( nil, 'ARTWORK', nil, 2 )
-  t:SetTexture( 'Interface\\Addons\\vars\\textures\\frame' )
-  t:SetSize( 
+  f[ 'browser' ] = self:createFrame( 'Frame', 'browser', f )
+  f[ 'browser' ]:SetSize( 
     f:GetWidth( ) - 20, 
     ( 
       f:GetHeight( ) - ( f[ 'titlearea' ]:GetHeight( ) + f[ 'controls' ]:GetHeight( ) )
-    ) - 55 
+    ) - 8 
   )
-  t:SetPoint( 'topleft', f[ 'controls' ], 'bottomleft', 0, -10 )
-  f[ 'browser' ] = t
+  f[ 'browser' ]:SetPoint( 'topleft', f[ 'controls' ], 'bottomleft', 0, -10 )
+  local t = f:CreateTexture( nil, 'ARTWORK', nil, 0 )
+  t:SetTexture( 'Interface\\Addons\\vars\\textures\\frame' )
+  t:SetAllPoints( f[ 'browser' ] )
+  f[ 'browser' ][ 'background' ] = t
 
   local t = f:CreateTexture( nil, 'ARTWORK', nil, 3 )
   t:SetTexture( 'Interface\\Addons\\vars\\textures\\AzeriteCenterBGGold' )
   t:SetSize( 65, f[ 'browser' ]:GetHeight( ) )
   t:SetPoint( 'topright', f[ 'browser' ], 'topright', 0, 0 )
-  f[ 'browserart' ] = t
+  f[ 'browser' ][ 'browserart' ] = t
 
-  local u = f:CreateTexture( nil, 'ARTWORK', nil, 2 )
-  u:SetTexture( 'Interface\\Addons\\vars\\textures\\frame' )
-  u:SetSize( f:GetWidth( ) - 20, 25 )
-  u:SetPoint( 'topleft', f[ 'browser' ], 'bottomleft', 0, -5 )
-  f[ 'updates' ] = u
+  f[ 'updates' ] = self:createFrame( 'Frame', 'updates', f )
+  f[ 'updates' ]:SetSize( f:GetWidth( ) - 20, 25 )
+  f[ 'updates' ]:SetPoint( 'topleft', f[ 'browser' ], 'bottomleft', 0, -5 )
+  local t = f:CreateTexture( nil, 'ARTWORK', nil, 0 )
+  t:SetTexture( 'Interface\\Addons\\vars\\textures\\frame' )
+  t:SetAllPoints( f[ 'updates' ] )
+  f[ 'updates' ][ 'background' ] = t
 
-  f[ 'scroll' ] = f[ 'scroll' ] or self:createFrame(
+  f[ 'scroll' ] = self:createFrame(
     'ScrollFrame', vars:GetName( ) .. 'Scroll', f, 'UIPanelScrollFrameTemplate' 
   )
   f[ 'scroll' ]:SetPoint( 'topleft', f[ 'browser' ], 'topleft', -25, -2 )
   f[ 'scroll' ]:SetPoint( 'bottomright', f[ 'browser' ], 'bottomright', -25, 2 )
-  f[ 'content_region' ] = self:createFrame(
-    'Frame', vars:GetName( ) .. 'Content', f[ 'scroll' ]
-  )
-  f[ 'content_region' ]:SetSize( f[ 'browser' ]:GetWidth( ), f[ 'browser' ]:GetHeight( ) - 20 )
-  f[ 'content_region' ]:SetAllPoints( )
-  f[ 'scroll' ]:SetScrollChild( f[ 'content_region' ] )
-  local tab_names = {
-    {
-      text = 'Mod'
-    },
-    --[[{
-      text = 'Sys'
-    },]]
-  }
+
+  local tab_names = { { text = 'Mod' }, { text = 'Sys' } }
   f[ 'containers' ] = self:createTabs( f, tab_names )
 
-  f:Hide( )
-
-  return f
-
-end
-
--- creates a resizing element
---
--- returns table
-function frames:createResizer( f )
-  self[ 'rs' ] = self[ 'rs' ] or self:createFrame( 'Button', 'resize', f )
-  self[ 'rs' ]:SetSize( 16, 16 )
-  self[ 'rs' ]:SetPoint( 'bottomright' )
-  self[ 'rs' ]:SetNormalTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up' )
-  self[ 'rs' ]:SetHighlightTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight' )
-  self[ 'rs' ]:SetPushedTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down' )
-  self[ 'rs' ]:SetScript( 'OnMouseDown', function( self, b )
+  f[ 'resizer' ] = self:createFrame( 'Button', 'resize', f )
+  f[ 'resizer' ]:SetSize( 16, 16 )
+  f[ 'resizer' ]:SetPoint( 'bottomright' )
+  f[ 'resizer' ]:SetNormalTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up' )
+  f[ 'resizer' ]:SetHighlightTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight' )
+  f[ 'resizer' ]:SetPushedTexture( 'Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down' )
+  f[ 'resizer' ]:SetScript( 'OnMouseDown', function( self, b )
     if b == 'LeftButton' then
       self[ 'scaling' ] = true
     end
   end )
-  self[ 'rs' ]:SetScript( 'OnMouseUp', function( self, b )
+  f[ 'resizer' ]:SetScript( 'OnMouseUp', function( self, b )
     if b == 'LeftButton' then
       self[ 'scaling' ] = false
       frames:getNameSpace( )[ 'scale' ] = self:GetParent( ):GetScale( )
     end
   end )
-  self[ 'rs' ]:SetScript( 'OnUpdate', function( self, b )
+  f[ 'resizer' ]:SetScript( 'OnUpdate', function( self, b )
     if self[ 'scaling' ] == true then
       local cx, cy = GetCursorPosition( )
       cx = cx / self:GetEffectiveScale( ) - self:GetParent( ):GetLeft( ) 
@@ -230,7 +211,21 @@ function frames:createResizer( f )
     end
   end )
 
-  return self[ 'rs' ]
+  f[ 'dbwipe' ] = frames:createButton( f[ 'containers' ][ 2 ], 'Database Wipe', 'dbwipe' )
+  f[ 'dbwipe' ]:SetSize( 125, 25 )
+  f[ 'dbwipe' ]:SetPoint( 'topleft', f[ 'browser' ], 'topleft', 10, -10 )
+
+  f[ 'rlgx' ] = frames:createCheckbox( f[ 'containers' ][ 2 ], 'Reload Graphics', 'rlgx' )
+  f[ 'rlgx' ]:SetSize( 25, 25 )
+  f[ 'rlgx' ]:SetPoint( 'topleft', f[ 'dbwipe' ], 'bottomleft', 0, -10 )
+
+  f[ 'rlui' ] = frames:createCheckbox( f[ 'containers' ][ 2 ], 'Reload UI', 'rlui' )
+  f[ 'rlui' ]:SetSize( 25, 25 )
+  f[ 'rlui' ]:SetPoint( 'topleft', f[ 'rlgx' ], 'bottomleft', 0, -10 )
+
+  f:Hide( )
+
+  return f
 
 end
 
@@ -265,26 +260,22 @@ function frames:createButton( f, text, name )
 
 end
 
--- creates text
--- 
--- returns table
-function frames:createText( f, text, size, theme )
+function frames:createCheckbox( f, text, name )
 
-  if size == nil then size = vars[ 'theme' ][ 'font' ][ 'normal' ] end
-  if theme == nil then theme = 'text' end
-  local t = f:CreateFontString( nil, 'ARTWORK', 'GameFontHighlightSmall' )
-  t:SetFont( vars[ 'theme' ][ 'font' ][ 'family' ], size, vars[ 'theme' ][ 'font' ][ 'flags' ] )
-  t:SetText( text )
-  t:SetTextColor( 
-    vars[ 'theme' ][ theme ][ 'r' ],
-    vars[ 'theme' ][ theme ][ 'g' ],
-    vars[ 'theme' ][ theme ][ 'b' ],
-    0.7
-  )
-  t:SetJustifyH( 'left' )
-  t:SetJustifyV( 'top' )
+  if name == nil then name = random( 0, 9999 ) end
+  local c = self:createFrame( 'CheckButton', name, f, 'UICheckButtonTemplate' )
+  c:SetNormalTexture( 'Interface\\Buttons\\UI-Button-Outline' )
+  c:SetPushedTexture( 'Interface\\Buttons\\UI-CheckBox-Down' )
+  c:SetHighlightTexture( 'Interface\\Buttons\\CheckButtonHilight-Blue' )
+  c:SetCheckedTexture( 'Interface\\Buttons\\UI-CheckBox-Check' )
+  c:SetDisabledTexture( 'Interface\\Buttons\\UI-CheckBox-Check-Disabled' )
+  
+  c[ 'text' ] = self:createText( f, text )
+  c[ 'text' ]:SetPoint( 'topleft', c, 'topright', 1, -6 )
 
-  return t
+  --c:SetChecked( true )
+
+  return c
 
 end
 
@@ -309,6 +300,29 @@ function frames:createEditBox( f, text, name, theme )
   )
 
   return e
+
+end
+
+-- creates text
+-- 
+-- returns table
+function frames:createText( f, text, size, theme )
+
+  if size == nil then size = vars[ 'theme' ][ 'font' ][ 'normal' ] end
+  if theme == nil then theme = 'text' end
+  local t = f:CreateFontString( nil, 'ARTWORK', 'GameFontHighlightSmall' )
+  t:SetFont( vars[ 'theme' ][ 'font' ][ 'family' ], size, vars[ 'theme' ][ 'font' ][ 'flags' ] )
+  t:SetText( text )
+  t:SetTextColor( 
+    vars[ 'theme' ][ theme ][ 'r' ],
+    vars[ 'theme' ][ theme ][ 'g' ],
+    vars[ 'theme' ][ theme ][ 'b' ],
+    0.7
+  )
+  t:SetJustifyH( 'left' )
+  t:SetJustifyV( 'top' )
+
+  return t
 
 end
 
@@ -368,11 +382,70 @@ function frames:tabClick( self )
   if scroll_child then
     scroll_child:Hide( )
   end
-
   self:GetParent( )[ 'scroll' ]:SetScrollChild( self[ 'content' ] )
   self:GetParent( )[ 'scroll' ][ 'ScrollBar' ]:SetValue( 0 )
   self[ 'content' ]:Show( )
 
+  local s = frames:getNameSpace( )[ 'sizes' ]
+  if s == nil then
+
+    local size = { 
+      w = self:GetParent( )[ 'controls' ]:GetWidth( ),
+      h = self:GetParent( )[ 'controls' ]:GetHeight( ),
+    }
+
+    frames:getNameSpace( )[ 'sizes' ] = { }
+    frames:getNameSpace( )[ 'sizes' ][ 'controls' ] = size
+
+    size = { 
+      w = self:GetParent( )[ 'browser' ]:GetWidth( ),
+      h = self:GetParent( )[ 'browser' ]:GetHeight( ),
+    }
+    frames:getNameSpace( )[ 'sizes' ][ 'browser' ] = size
+
+  end
+
+  s = frames:getNameSpace( )[ 'sizes' ]
+
+  if self:GetID( ) == 1 then
+    self:GetParent( )[ 'controls' ]:Show( )
+    self:GetParent( )[ 'controls' ][ 'background' ]:Show( )
+    self:GetParent( )[ 'controls' ][ 'controlsart' ]:Show( )
+    self:GetParent( )[ 'browser' ]:SetSize(
+      s[ 'browser' ][ 'w' ], 
+      s[ 'browser' ][ 'h' ]
+    )
+    self:GetParent( )[ 'browser' ]:ClearAllPoints( )
+    self:GetParent( )[ 'browser' ]:SetPoint(
+      'topleft', self:GetParent( )[ 'controls' ], 'bottomleft', 0, -5
+    )
+    self:GetParent( )[ 'browser' ][ 'browserart' ]:SetSize(
+      65, self:GetParent( )[ 'browser' ]:GetHeight( )
+    )
+    self:GetParent( )[ 'scroll' ][ 'ScrollBar' ][ 'ScrollDownButton' ]:Enable( )
+    self:GetParent( )[ 'scroll' ][ 'ScrollBar' ][ 'ScrollUpButton' ]:Enable( )
+  elseif self:GetID( ) == 2 then
+    self:GetParent( )[ 'controls' ]:Hide( )
+    self:GetParent( )[ 'controls' ][ 'background' ]:Hide( )
+    self:GetParent( )[ 'controls' ][ 'controlsart' ]:Hide( )
+    self:GetParent( )[ 'browser' ]:SetSize(
+      s[ 'browser' ][ 'w' ], 
+      s[ 'browser' ][ 'h' ]
+    )
+    self:GetParent( )[ 'browser' ]:SetSize(
+      s[ 'browser' ][ 'w' ], 
+      s[ 'browser' ][ 'h' ] + s[ 'controls' ][ 'h' ] + 5
+    )
+    self:GetParent( )[ 'browser' ]:ClearAllPoints( )
+    self:GetParent( )[ 'browser' ]:SetPoint(
+      'topleft', self:GetParent( )[ 'controls' ], 'topleft', 0, 0
+    )
+    self:GetParent( )[ 'browser' ][ 'browserart' ]:SetSize(
+      65, self:GetParent( )[ 'browser' ]:GetHeight( ) 
+    )
+    self:GetParent( )[ 'scroll' ][ 'ScrollBar' ][ 'ScrollDownButton' ]:Disable( )
+    self:GetParent( )[ 'scroll' ][ 'ScrollBar' ][ 'ScrollUpButton' ]:Disable( )
+  end
 end
 
 -- sorts table in direction
@@ -397,7 +470,6 @@ function frames:sort( t, direction )
 
 end
 
-
 -- creates dropdown
 --
 -- returns table
@@ -410,9 +482,7 @@ function frames:createDropDown( calling_instance, name, parent, list )
   f[ 'list' ] = list
 
   UIDropDownMenu_Initialize( f, function( self )
-
     frames:dropdownInitialize( f, self[ 'list' ], self[ 'calling_instance' ] )
-
   end )
 
   return f
