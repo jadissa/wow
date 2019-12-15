@@ -283,11 +283,15 @@ function ui:createMenu( )
   local frames = vars:GetModule( 'frames' )
   self[ 'menu' ] = self[ 'menu' ] or frames:bootUI( )
 
-  self[ 'search'] = self[ 'search'] or frames:createFrame( 'EditBox', 'search_box', self[ 'menu' ], 'BagSearchBoxTemplate' )
+  self[ 'search'] = frames:createFrame( 'EditBox', 'search_box', self[ 'menu' ][ 'controls' ], 'BagSearchBoxTemplate' )
   self[ 'search']:SetSize( 100, 25 )
-  self[ 'search']:SetBackdropColor( 0, 1, 0, .9 )
+  self[ 'search']:SetBackdropColor( 0, 1, 0, .9 )  
   self[ 'search']:SetPoint( 'topleft', self[ 'menu' ][ 'controls' ], 'topleft', 100, -14 )
-  self[ 'search']:SetScript( 'OnTextChanged', function( self )
+
+
+  -- GLARING BUG that causes key presses to lose focus
+  --self[ 'search']:SetScript( 'OnTextChanged', function( self )
+    self[ 'search']:SetScript( 'OnEnterPressed', function( self )
     local input_text = self:GetText( )
     if( string.len( input_text ) >= 3 ) then
       persistence[ 'search' ][ 'text' ] = strlower( input_text )
@@ -301,9 +305,9 @@ function ui:createMenu( )
     --self:SetAutoFocus( false )
     self:SetText( '' )
     persistence[ 'search' ][ 'text' ] = nil
-    C_Timer.After( 1, function( )
+    --[[C_Timer.After( 1, function( )
       ui:iterateList( ui:filterList( ) )
-    end )
+    end )]]
 
   end )
 
@@ -313,12 +317,12 @@ function ui:createMenu( )
     persistence[ 'search' ][ 'text' ] = nil
   end )
   
-  local vn = frames:createText( self[ 'menu' ], 'var' )
+  local vn = frames:createText( self[ 'menu' ][ 'controls' ], 'var' )
   vn:SetJustifyH( 'right' )
   vn:SetSize( 25, 20 )
   vn:SetPoint( 'topleft', self[ 'search'], 'topright', 0, -6 )
 
-  local s = frames:createButton( self[ 'menu' ], '^', 'sorted' )
+  local s = frames:createButton( self[ 'menu' ][ 'controls' ], '^', 'sorted' )
   s:SetSize( 10, 10 )
   s:SetPoint( 'topleft', vn, 'topright', 0, 0 )
   s:SetFrameLevel( 5 )
@@ -332,17 +336,17 @@ function ui:createMenu( )
     ui:iterateList( ui:filterList( ) )
   end )
 
-  local vs = frames:createText( self[ 'menu' ], 'state' )
+  local vs = frames:createText( self[ 'menu' ][ 'controls' ], 'state' )
   vs:SetJustifyH( 'left' )
   vs:SetSize( 50, 20 )
   vs:SetPoint( 'topleft', vn, 'topright', 20, 0 )
 
-  local vv = frames:createText( self[ 'menu' ], 'value' )
+  local vv = frames:createText( self[ 'menu' ][ 'controls' ], 'value' )
   vv:SetJustifyH( 'left' )
   vv:SetSize( 50, 20 )
   vv:SetPoint( 'topleft', vs, 'topright', 20, 0 )
 
- local vh = frames:createText( self[ 'menu' ], 'help' )
+ local vh = frames:createText( self[ 'menu' ][ 'controls' ], 'help' )
   vh:SetJustifyH( 'left' )
   vh:SetSize( 50, 20 )
   vh:SetPoint( 'topleft', vv, 'topright', 20, 0 )
@@ -361,9 +365,42 @@ function ui:createMenu( )
     ddl[ i ][ 'value' ]  = category
     i = i + 1
   end
-  local d = frames:createDropDown( self, 'category', self[ 'menu' ], ddl )
+  local d = frames:createDropDown( self, 'category', self[ 'menu' ][ 'controls' ], ddl )
   d:SetPoint( 'topleft', vh, 'topright', -15, 8 )
   self[ 'menu' ][ 'dropdown' ] = d
+
+  self[ 'menu' ][ 'dbwipe' ]:SetScript( 'OnClick', function( self )
+    vars:wipeDB( )
+    tracked:_geParenttDB( ):ResetDB( )
+    ui:updateStats( 
+      ui[ 'menu' ], 
+      ui[ 'registry' ][ 'vars_count' ], 
+      ui[ 'registry' ][ 'tracked_count' ], 
+      'done' 
+    )
+  end )
+
+  self[ 'menu' ][ 'rlgx' ]:SetChecked( persistence[ 'options' ][ 'reloadgx' ] or false )
+  self[ 'menu' ][ 'rlgx' ]:SetScript( 'OnClick', function( self )
+    persistence[ 'options' ][ 'reloadgx' ] = self:GetChecked( )
+    ui:updateStats( 
+      ui[ 'menu' ], 
+      ui[ 'registry' ][ 'vars_count' ], 
+      ui[ 'registry' ][ 'tracked_count' ], 
+      'done' 
+    )
+  end )
+
+  self[ 'menu' ][ 'rlui' ]:SetChecked( persistence[ 'options' ][ 'reloadui' ] or false )
+  self[ 'menu' ][ 'rlui' ]:SetScript( 'OnClick', function( self )
+    persistence[ 'options' ][ 'reloadui' ] = self:GetChecked( )
+    ui:updateStats( 
+      ui[ 'menu' ], 
+      ui[ 'registry' ][ 'vars_count' ], 
+      ui[ 'registry' ][ 'tracked_count' ], 
+      'done' 
+    )
+  end )
 
   return self[ 'menu' ]
 
@@ -426,7 +463,8 @@ function ui:updateStats( f, vars_count, tracked_count, message )
       vars[ 'theme' ][ 'font' ][ 'small' ],
       'warn' 
     )
-    t:SetPoint( 'topleft', f[ 'updates' ], 'topleft', 10, -5 )
+    t:SetPoint( 'topleft', f[ 'updates' ], 'topleft', 135, -5 )
+
     ui[ 'registry'][ 'stats' ][ 'message' ] = t
 
     -- # vars found
