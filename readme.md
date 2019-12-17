@@ -1,5 +1,6 @@
 warcraft mods
 
 organization:
-Retail mods: _retail_
+<pre>Retail mods: _retail_
 Classic mods: _classic_
+</pre>
