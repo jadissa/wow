@@ -175,7 +175,7 @@ function frames:bootUI( )
   f[ 'scroll' ]:SetPoint( 'topleft', f[ 'browser' ], 'topleft', -25, -2 )
   f[ 'scroll' ]:SetPoint( 'bottomright', f[ 'browser' ], 'bottomright', -25, 2 )
 
-  local tab_names = { { text = 'Mod' }, { text = 'Sys' }, { text = 'Info' } }
+  local tab_names = { { text = 'Mod' }, { text = 'Sys' } }
   f[ 'containers' ] = self:createTabs( f, tab_names )
 
   f[ 'resizer' ] = self:createFrame( 'Button', 'resize', f )
@@ -228,18 +228,6 @@ function frames:bootUI( )
   f[ 'rlui' ]:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
   local t = self:createText( f[ 'containers' ][ 2 ], 'Some settings require a full reload of your ui', 8, 'warn' )
   t:SetPoint( 'topleft', f[ 'rlui' ], 'bottomleft', 0, 0 )
-
-  local d = self:createText( f[ 'containers' ][ 3 ], 'If you see something you do not like or want changed, feel free to make a pull request and perhaps your revision will make it to future releases', 8, 'warn' )
-  d:SetPoint( 'center', f[ 'containers' ][ 3 ], 'center', 0, 0 )
-
-  local s = self:createText( f[ 'containers' ][ 3 ], '- Jadissa' )
-  s:SetPoint( 'topleft', d, 'bottomleft', 0, 0 )
-  s:SetFont( 'Fonts\\SKURRI.ttf', 8, 'OUTLINE, MONOCHROME' )
-
-  local p = self:createText( f[ 'containers' ][ 3 ], 'Project:', 8, 'warn' )
-  p:SetPoint( 'topleft', s, 'bottomleft', 0, -10 )
-  local pd = self:createText( f[ 'containers' ][ 3 ], 'https://github.com/jadissa/wow/', 8, 'text' )
-  pd:SetPoint( 'left', p, 'right', 0, 0 )
 
   f:Hide( )
 
