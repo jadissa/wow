@@ -430,7 +430,7 @@ function frames:tabClick( self )
     )
     self:GetParent( )[ 'scroll' ][ 'ScrollBar' ][ 'ScrollDownButton' ]:Enable( )
     self:GetParent( )[ 'scroll' ][ 'ScrollBar' ][ 'ScrollUpButton' ]:Enable( )
-  elseif self:GetID( ) == 2 or self:GetID( ) == 3 then
+  elseif self:GetID( ) == 2 then
     self:GetParent( )[ 'controls' ]:Hide( )
     self:GetParent( )[ 'controls' ][ 'background' ]:Hide( )
     self:GetParent( )[ 'controls' ][ 'controlsart' ]:Hide( )
