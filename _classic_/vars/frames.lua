@@ -214,14 +214,20 @@ function frames:bootUI( )
   f[ 'dbwipe' ] = frames:createButton( f[ 'containers' ][ 2 ], 'Database Wipe', 'dbwipe' )
   f[ 'dbwipe' ]:SetSize( 125, 25 )
   f[ 'dbwipe' ]:SetPoint( 'topleft', f[ 'browser' ], 'topleft', 10, -10 )
+  local t = self:createText( f[ 'containers' ][ 2 ], 'You can use this if your configuration becomes corrupt. all configurations are repulled from Warcaft for a fresh DB', 8, 'warn' )
+  t:SetPoint( 'topleft', f[ 'dbwipe' ], 'bottomleft', 0, 0 )
 
   f[ 'rlgx' ] = frames:createCheckbox( f[ 'containers' ][ 2 ], 'Reload Graphics', 'rlgx' )
   f[ 'rlgx' ]:SetSize( 25, 25 )
-  f[ 'rlgx' ]:SetPoint( 'topleft', f[ 'dbwipe' ], 'bottomleft', 0, -10 )
+  f[ 'rlgx' ]:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
+  local t = self:createText( f[ 'containers' ][ 2 ], 'Some settings may only require a reload of your graphics', 8, 'warn' )
+  t:SetPoint( 'topleft', f[ 'rlgx' ], 'bottomleft', 0, 0 )
 
   f[ 'rlui' ] = frames:createCheckbox( f[ 'containers' ][ 2 ], 'Reload UI', 'rlui' )
   f[ 'rlui' ]:SetSize( 25, 25 )
-  f[ 'rlui' ]:SetPoint( 'topleft', f[ 'rlgx' ], 'bottomleft', 0, -10 )
+  f[ 'rlui' ]:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
+  local t = self:createText( f[ 'containers' ][ 2 ], 'Some settings require a full reload of your ui', 8, 'warn' )
+  t:SetPoint( 'topleft', f[ 'rlui' ], 'bottomleft', 0, 0 )
 
   f:Hide( )
 
@@ -413,7 +419,7 @@ function frames:tabClick( self )
     self:GetParent( )[ 'controls' ][ 'controlsart' ]:Show( )
     self:GetParent( )[ 'browser' ]:SetSize(
       s[ 'browser' ][ 'w' ], 
-      s[ 'browser' ][ 'h' ]
+      s[ 'browser' ][ 'h' ] - s[ 'controls' ][ 'h' ] + 45
     )
     self:GetParent( )[ 'browser' ]:ClearAllPoints( )
     self:GetParent( )[ 'browser' ]:SetPoint(
@@ -428,10 +434,6 @@ function frames:tabClick( self )
     self:GetParent( )[ 'controls' ]:Hide( )
     self:GetParent( )[ 'controls' ][ 'background' ]:Hide( )
     self:GetParent( )[ 'controls' ][ 'controlsart' ]:Hide( )
-    self:GetParent( )[ 'browser' ]:SetSize(
-      s[ 'browser' ][ 'w' ], 
-      s[ 'browser' ][ 'h' ]
-    )
     self:GetParent( )[ 'browser' ]:SetSize(
       s[ 'browser' ][ 'w' ], 
       s[ 'browser' ][ 'h' ] + s[ 'controls' ][ 'h' ] + 5
