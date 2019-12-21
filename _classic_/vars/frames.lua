@@ -497,8 +497,6 @@ function frames:dropdownInitialize( frame, list_items, calling_instance )
     local b = UIDropDownMenu_CreateInfo()
     if v[ 'checked' ] == true then
       selected_index     = i
-      -- @todo: figure out way to uncheck previously checked items
-      -- before re-enabling this
     else
       b[ 'checked' ]     = false
     end
@@ -513,8 +511,16 @@ function frames:dropdownInitialize( frame, list_items, calling_instance )
     b[ 'leftPadding' ]   = nil
     b[ 'padding' ]       = nil
     b[ 'justifyH' ]      = nil
-    --b[ 'colorCode' ]   = '|cff' .. vars[ 'theme' ][ 'b' ][ 'hex' ]
+    b[ 'colorCode' ]     = '|cff' .. vars[ 'theme' ][ 'text' ][ 'hex' ]
     b[ 'func' ]          = function( self )
+
+    --[[
+    local font = _G.CreateFont( vars[ 'theme' ][ 'font' ][ 'family' ] );
+    font:SetFontObject( 'GameFontHighlightSmall' );
+    font:SetTextColor( 0, 1, 0 );
+
+    b[ 'fontObject' ]    = font
+    ]]
 
     UIDropDownMenu_SetSelectedValue( frame, self[ 'value' ] )
     UIDropDownMenu_RefreshAll( frame, self[ 'value' ] )
