@@ -456,7 +456,6 @@ function ui:updateStats( f, vars_count, tracked_count, message )
     ui[ 'registry'][ 'stats' ] = { }
     local frames = vars:GetModule( 'frames' )
 
-    -- what happened
     local t = frames:createText(
       f, 
       nil,
@@ -467,7 +466,6 @@ function ui:updateStats( f, vars_count, tracked_count, message )
 
     ui[ 'registry'][ 'stats' ][ 'message' ] = t
 
-    -- # vars found
     local found_label = frames:createText( 
       f, 
       'Vars:', 
@@ -491,8 +489,7 @@ function ui:updateStats( f, vars_count, tracked_count, message )
     )
     found_count:SetPoint( 'topleft', found_label, 'topright', 0, 0 )
     ui[ 'registry'][ 'stats' ][ 'vars_count' ] = found_count
-
-    -- # vars tracked
+    
     local tracked_label = frames:createText( 
       f, 
       'Tracking:', 
