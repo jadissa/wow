@@ -1,6 +1,6 @@
 manage cvar settings in World of Warcraft
 
-![warcraft-cvars](https://i.imgur.com/RDINSy9.png =200x)
+<img src="https://i.imgur.com/RDINSy9.png" width="200" />
 
 initial version
 
