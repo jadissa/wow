@@ -172,10 +172,6 @@ function ui:iterateList( list )
           local s = frames:createSeperator( self[ 'menu' ][ 'containers' ][ 1 ] )
           s:SetPoint( 'topleft', c, 'bottomleft', 10, 0, 0 )
 
-          if row[ 'tracked' ] then
-            self[ 'registry' ][ 'tracked_count' ] = self[ 'registry' ][ 'tracked_count' ] + 1
-          end
-
           local v = frames:createEditBox( self[ 'menu' ][ 'containers' ][ 1 ], row[ 'value' ] )
           v[ 'v_identifier' ] = category .. '|' .. row[ 'command' ]
           v[ 'v_value' ]      = row[ 'value' ]

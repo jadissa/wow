@@ -146,12 +146,10 @@ function tracked:applyConfig( category )
   local updated       = false
   local known_vars    = self:getConfig( )
   for cat, rows in pairs( known_vars ) do
-    if cat == category then
-      if type( rows ) == 'table' then
-        for i, row in pairs( rows ) do
-          if row[ 'tracked' ] then
-            tracked_count = tracked_count + 1
-          end
+    if type( rows ) == 'table' then
+      for i, row in pairs( rows ) do
+        if row[ 'tracked' ] == true then
+          tracked_count = tracked_count + 1
         end
       end
     end
