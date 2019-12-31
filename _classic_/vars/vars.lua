@@ -124,6 +124,57 @@ function vars:getTypes( )
 
 end
 
+-- protected types reference
+-- some variables can not be modified in certain circumstances (ptype)
+--
+-- returns table
+function vars:getProtected( ptype )
+
+  local list = {
+    combat = {
+      'alwaysShowActionBars',
+      'bloatnameplates',
+      'bloatTest',
+      'bloatthreat',
+      'consolidateBuffs',
+      'fullSizeFocusFrame',
+      'maxAlgoplates',
+      'nameplateMotion',
+      'nameplateOverlapH',
+      'nameplateOverlapV',
+      'nameplateShowEnemies',
+      'nameplateShowEnemyGuardians',
+      'nameplateShowEnemyPets',
+      'nameplateShowEnemyTotems',
+      'nameplateShowFriendlyGuardians',
+      'nameplateShowFriendlyPets',
+      'nameplateShowFriendlyTotems',
+      'nameplateShowFriends',
+      'repositionfrequency',
+      'SetUIVisibility',
+      'showArenaEnemyFrames',
+      'showArenaEnemyPets',
+      'showPartyPets',
+      'showTargetOfTarget',
+      'targetOfTargetMode',
+      'uiScale',
+      'useCompactPartyFrames',
+      'useUiScale',
+    }
+  }
+
+  if not ptype then
+    ptype = 'combat'
+  end
+
+  if not list[ ptype ] then
+    return { }
+  else
+    return list[ ptype ]
+  end
+
+end
+
 -- set/get configuration
 -- if it needs to be modified, a copy should be made
 -- keep this copy pristine and in original condition

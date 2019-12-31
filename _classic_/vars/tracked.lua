@@ -158,29 +158,38 @@ function tracked:applyConfig( category )
   for i, pending in pairs( tracked[ 'queue' ] ) do
     for category, data in pairs( pending ) do
       for j, setting in pairs( data ) do
-      	for index, value in pairs( setting ) do
+        for index, value in pairs( setting ) do
           if known_vars[ category ][ j ] then
-          	local current_value = GetCVar( index )
-          	if strlower( tostring( current_value ) ) ~= strlower( tostring( value ) ) then
+            local current_value = GetCVar( index )
+            if strlower( tostring( current_value ) ) ~= strlower( tostring( value ) ) then
               message = index .. ' updated from: ' .. current_value .. ' to: ' .. tostring( value )
-              SetCVar( index, value )
-              local default_value = GetCVarDefault( index )
-              local evaluation = strlower( tostring( value ) ) ~= strlower( tostring( default_value ) )
-              known_vars[ category ][ j ][ 'tracked' ] = evaluation
-              if not evaluation then
-                tracked_count = tracked_count - 1
+              local list = vars:getProtected( 'combat' )
+              if tContains( list, index ) ~= false and InCombatLockdown( ) == true then
+                message = index .. ' can only be modified outside of combat'
+              else
+                SetCVar( index, value )
+                if GetCVar( index ) ~= value then
+                  message = 'failed'
+                else
+                  local default_value = GetCVarDefault( index )
+                  local evaluation = strlower( tostring( value ) ) ~= strlower( tostring( default_value ) )
+                  known_vars[ category ][ j ][ 'tracked' ] = evaluation
+                  if not evaluation then
+                    tracked_count = tracked_count - 1
+                  end
+                  updated = true
+                end
               end
-    	  	  	updated = true
-      	  	else
-      	  		message = 'this setting is already applied'
-      	  	end
-      	  	tracked[ 'queue' ] = { }
+            else
+              message = 'this setting is already applied'
+            end
+            tracked[ 'queue' ] = { }
           end
         end
       end
     end 
   end
-  
+
   local persistence = self:getNameSpace( )
   if persistence[ 'options' ][ 'reloadgx' ] and updated then 
   	RestartGx( )
