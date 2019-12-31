@@ -375,6 +375,45 @@ function ui:createMenu( )
       'done' 
     )
   end )
+  
+  self[ 'menu' ][ 'defaults' ]:SetScript( 'OnClick', function( self )
+
+    if not frames[ 'confirm_defaults' ] then
+      local f = frames:createFrame( 'Frame', 'confirm_defaults', self:GetParent( ) )
+
+      f:SetPoint( 'center', self:GetParent( ), 'center', 0, 0 )
+      f:SetSize( 100, 100 )
+      
+      local t = frames:createText( f, 'are you sure?' )
+      t:SetSize( 100, 25 )
+      t:SetPoint( 'center', f, 'center', 0, 0 )
+      t:SetJustifyH( 'center' )
+      
+      local c = frames:createButton( f, 'Cancel', 'cancel_defaults' )
+      c:SetSize( 50, 25 )
+      c:SetPoint( 'topleft', t, 'bottomleft', 0, 0 )
+      c:SetScript( 'OnClick', function( self )
+        f:Hide( )
+      end )
+      
+      local o = frames:createButton( f, 'Yes', 'apply_defaults' )
+      o:SetSize( 50, 25 )
+      o:SetPoint( 'topleft', c, 'topright', 0, 0 )
+      o:SetScript( 'OnClick', function( self )
+        vars:applyDefaults( )
+        ui:updateStats( 
+        ui[ 'menu' ], 
+        ui[ 'registry' ][ 'vars_count' ], 
+        ui[ 'registry' ][ 'tracked_count' ], 
+        'done' 
+      )
+      ReloadUI( )
+      end )
+    else
+      frames[ 'confirm_defaults' ]:Show( )
+    end
+
+  end )
 
   self[ 'menu' ][ 'rlgx' ]:SetChecked( persistence[ 'options' ][ 'reloadgx' ] or false )
   self[ 'menu' ][ 'rlgx' ]:SetScript( 'OnClick', function( self )
