@@ -160,14 +160,14 @@ function ui:iterateList( list )
           c[ 'c_identifier' ] = category .. '|' .. row[ 'command' ]
           c[ 'c_value' ]      = row[ 'command' ]
           c:SetJustifyH( 'right' )
-          c:SetSize( 225, 20 )
+          c:SetSize( 225, 40 )
 
           local t = frames:createText( self[ 'menu' ][ 'containers' ][ 1 ], tracked:indicate( row[ 'tracked' ] ) )
           t[ 't_identifier' ] = category .. '|' .. row[ 'command' ]
           t[ 't_value' ]      = tracked:indicate( row[ 'tracked' ] )
           ui[ 'registry'][ t[ 't_identifier' ] ] = t
           t:SetJustifyH( 'left' )
-          t:SetSize( 50, 20 )
+          t:SetSize( 50, 40 )
 
           local s = frames:createSeperator( self[ 'menu' ][ 'containers' ][ 1 ] )
           s:SetPoint( 'topleft', c, 'bottomleft', 10, 0, 0 )
@@ -176,8 +176,9 @@ function ui:iterateList( list )
           v[ 'v_identifier' ] = category .. '|' .. row[ 'command' ]
           v[ 'v_value' ]      = row[ 'value' ]
           v:SetCursorPosition( 0 )
-          v:SetJustifyH( 'left' )
-          v:SetSize( 50, 20 )
+          --v:SetJustifyH( 'left' )
+          v:SetJustifyV( 'top' )
+          v:SetSize( 50, 10 )
           v:SetAutoFocus( false )
           v:SetFocus( false )
 
@@ -185,9 +186,9 @@ function ui:iterateList( list )
           d[ 'd_identifier' ] = category .. '|' .. row[ 'command' ]
           d[ 'd_value' ]      = row[ 'help' ]
           d:SetJustifyH( 'left' )
-          d:SetSize( 300, 20 )
+          d:SetSize( 265, 40 )
           d:SetNonSpaceWrap( true )
-          d:SetMaxLines( 2 )
+          d:SetMaxLines( 3 )
 
           ui[ 'registry'][ category .. '|' .. row[ 'command' ] ] = { }
           ui[ 'registry'][ category .. '|' .. row[ 'command' ] ][ 'var' ] = c
@@ -203,7 +204,7 @@ function ui:iterateList( list )
         )
         ui[ 'registry'][ category .. '|' .. row[ 'command' ] ][ 'var' ]:Show( )
         ui[ 'registry'][ category .. '|' .. row[ 'command' ] ][ 'state' ]:SetPoint(
-          'topleft', ui[ 'registry'][ category .. '|' .. row[ 'command' ] ][ 'var' ], 'topright', 20, 0
+          'topleft', ui[ 'registry'][ category .. '|' .. row[ 'command' ] ][ 'var' ], 'topright', 15, 0
         )
         ui[ 'registry'][ category .. '|' .. row[ 'command' ] ][ 'state' ]:Show( )
         ui[ 'registry'][ category .. '|' .. row[ 'command' ] ][ 'sep' ]:SetPoint(
@@ -258,7 +259,7 @@ function ui:iterateList( list )
         ui[ 'registry'][ category .. '|' .. row[ 'command' ] ][ 'help' ]:Show( )
 
         -- udpate dynamic data
-        positions[ 'y' ]  = positions[ 'y' ] - 25
+        positions[ 'y' ]  = positions[ 'y' ] - 35
         list[ category .. '|' .. row[ 'command' ] ] = t
 
       end
