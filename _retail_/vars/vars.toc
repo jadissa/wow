@@ -9,8 +9,8 @@
 ## Notes: Manages CVar Data
 ## X-Category: System
 # /run print((select(4, GetBuildInfo())));
-## X-Version: 80205
-## Interface: 80205
+## X-Version: 80300
+## Interface: 80300
 
 # Includes
 libs\AceDB-3.0\AceDB-3.0.xml
