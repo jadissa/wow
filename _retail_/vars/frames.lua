@@ -50,7 +50,7 @@ end
 function frames:bootUI( )
 
   local f = self:createFrame( 'Frame', vars:GetName( ) .. 'Main', UIParent, 'UIPanelDialogTemplate' )
-  f:SetFrameStrata( 'DIALOG' )
+  --f:SetFrameStrata( 'HIGH' )
   f:SetClampedToScreen( true )
   f:SetSize( 700, 400 )
   f:DisableDrawLayer( 'OVERLAY' )
