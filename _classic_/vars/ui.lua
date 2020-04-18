@@ -145,7 +145,7 @@ end
 -- displays filtered list items
 --
 -- returns void
-function ui:iterateList( list )
+function ui:iterateList( list, c_type )
 
   local positions   = { x = 30, y = 0 }
   local frames      = vars:GetModule( 'frames' )
@@ -260,7 +260,7 @@ function ui:iterateList( list )
 
         -- udpate dynamic data
         positions[ 'y' ]  = positions[ 'y' ] - 35
-        list[ category .. '|' .. row[ 'command' ] ] = t
+        --list[ category .. '|' .. row[ 'command' ] ] = t
 
       end
 
@@ -292,7 +292,7 @@ function ui:createMenu( )
     local input_text = self:GetText( )
     if( string.len( input_text ) >= 3 ) then
       persistence[ 'search' ][ 'text' ] = strlower( input_text )
-      ui:iterateList( ui:filterList( ) )
+      ui:iterateList( ui:filterList( ), 'search' )
       persistence[ 'search' ][ 'text' ] = nil
     end
   end )
