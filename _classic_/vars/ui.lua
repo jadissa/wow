@@ -182,6 +182,8 @@ function ui:iterateList( list, c_type )
           v:SetAutoFocus( false )
           v:SetFocus( false )
 
+          -- @todo: row['help'] may be defined but somehow only whitespace
+          --        this should be accounted for
           local d = frames:createText( self[ 'menu' ][ 'containers' ][ 1 ], row[ 'help' ] or '-' )
           d[ 'd_identifier' ] = category .. '|' .. row[ 'command' ]
           d[ 'd_value' ]      = row[ 'help' ]
@@ -265,6 +267,11 @@ function ui:iterateList( list, c_type )
       end
 
     end
+  end
+
+  local position  = self[ 'menu' ][ 'scroll' ][ 'ScrollBar' ]:GetValue( )
+  if position ~= 0 then
+    self[ 'menu' ][ 'scroll' ][ 'ScrollBar' ]:SetValue( 0 )
   end
 
   self:updateStats( self[ 'menu' ], self[ 'registry' ][ 'vars_count' ], self[ 'registry' ][ 'tracked_count' ], nil )
@@ -365,6 +372,15 @@ function ui:createMenu( )
   local d = frames:createDropDown( self, 'category', self[ 'menu' ][ 'controls' ], ddl )
   d:SetPoint( 'topleft', vh, 'topright', -15, 8 )
   self[ 'menu' ][ 'dropdown' ] = d
+
+  frames:SecureHook( 'UIDropDownMenu_SetSelectedValue', function( ) 
+
+    local position  = self:GetParent():GetParent()[ 'scroll' ][ 'ScrollBar' ]:GetValue( )
+    if position ~= 0 then
+      self:GetParent():GetParent()[ 'scroll' ][ 'ScrollBar' ]:SetValue( 0 )
+    end
+
+  end )
 
   self[ 'menu' ][ 'dbwipe' ]:SetScript( 'OnClick', function( self )
     vars:wipeDB( )
