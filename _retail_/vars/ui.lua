@@ -110,6 +110,15 @@ function ui:filterList( )
     for category, category_data in pairs( var_names ) do
       for o, row in pairs( category_data ) do
         local s     = strlower( row[ 'command' ] )
+
+        --[[
+        if s == 'nameplateverticalscale' then
+
+          utility:dump( row )
+
+        end
+        ]]
+
         local i, j  = string.find( s, search_string )
         if( i ~= nil and i > 0 ) and ( j ~= nil and j > 0 ) then
           if t[ category ] == nil then
@@ -374,16 +383,29 @@ function ui:createMenu( )
   d:SetPoint( 'topleft', vh, 'topright', -15, 8 )
   self[ 'menu' ][ 'dropdown' ] = d
 
-  frames:SecureHook( 'UIDropDownMenu_SetSelectedValue', function( self ) 
+  local hooked  = frames:IsHooked( 'UIDropDownMenu_SetSelectedValue' )
+  if not hooked then
+    frames:SecureHook( 'UIDropDownMenu_SetSelectedValue', function( self ) 
 
-    local position  = self:GetParent():GetParent()[ 'scroll' ][ 'ScrollBar' ]:GetValue( )
-    if position ~= 0 then
-      self:GetParent():GetParent()[ 'scroll' ][ 'ScrollBar' ]:SetValue( 0 )
-    end
+      if self:GetParent():GetParent()[ 'scroll' ] == nil then
+        return
+      end
+      local position  = self:GetParent():GetParent()[ 'scroll' ][ 'ScrollBar' ]:GetValue( )
+      if position ~= 0 then
+        self:GetParent():GetParent()[ 'scroll' ][ 'ScrollBar' ]:SetValue( 0 )
+      end
 
-  end )
+    end )
+  end
 
-  self[ 'menu' ][ 'dbwipe' ]:SetScript( 'OnClick', function( self )
+  local dbwipe = frames:createButton( self[ 'menu' ][ 'containers' ][ 2 ], 'Database Wipe', 'dbwipe' )
+  dbwipe:SetSize( 125, 25 )
+  dbwipe:SetPoint( 'topleft', self[ 'menu' ][ 'browser' ], 'topleft', 10, -10 )
+  local t = frames:createText( self[ 'menu' ][ 'containers' ][ 2 ], 'use this if vars configuration becomes corrupt. your modifications to game settings will persist', 9, 'warn' )
+  t:SetPoint( 'topleft', dbwipe, 'bottomleft', 0, 0 )
+  t:SetSize( ( self[ 'menu' ][ 'containers' ][ 2 ]:GetWidth( ) / 2 ) - 5, 20 )
+
+  dbwipe:SetScript( 'OnClick', function( self )
     vars:wipeDB( )
     tracked:_geParenttDB( ):ResetDB( )
     ui:updateStats( 
@@ -393,8 +415,15 @@ function ui:createMenu( )
       'done' 
     )
   end )
+
+  local defaults = frames:createButton( self[ 'menu' ][ 'containers' ][ 2 ], 'Reset to Defaults', 'defaults' )
+  defaults:SetSize( 125, 25 )
+  defaults:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
+  local t = frames:createText( self[ 'menu' ][ 'containers' ][ 2 ], 'resets your game configuration back to Blizzard default state', 9, 'warn' )
+  t:SetPoint( 'topleft', defaults, 'bottomleft', 0, 0 )
+  t:SetSize( ( self[ 'menu' ][ 'containers' ][ 2 ]:GetWidth( ) / 2 ) - 5, 20 )
   
-  self[ 'menu' ][ 'defaults' ]:SetScript( 'OnClick', function( self )
+  defaults:SetScript( 'OnClick', function( self )
 
     if not frames[ 'confirm_defaults' ] then
       local f = frames:createFrame( 'Frame', 'confirm_defaults', self:GetParent( ) )
@@ -433,8 +462,15 @@ function ui:createMenu( )
 
   end )
 
-  self[ 'menu' ][ 'rlgx' ]:SetChecked( persistence[ 'options' ][ 'reloadgx' ] or false )
-  self[ 'menu' ][ 'rlgx' ]:SetScript( 'OnClick', function( self )
+  local rlgx = frames:createCheckbox( self[ 'menu' ][ 'containers' ][ 2 ], 'Reload Graphics', 'rlgx' )
+  rlgx:SetSize( 25, 25 )
+  rlgx:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
+  local t = frames:createText( self[ 'menu' ][ 'containers' ][ 2 ], 'some settings may only require a reload of your graphics', 9, 'warn' )
+  t:SetPoint( 'topleft', rlgx, 'bottomleft', 0, 0 )
+  t:SetSize( ( self[ 'menu' ][ 'containers' ][ 2 ]:GetWidth( ) / 2 ) - 5, 20 )
+
+  rlgx:SetChecked( persistence[ 'options' ][ 'reloadgx' ] or false )
+  rlgx:SetScript( 'OnClick', function( self )
     persistence[ 'options' ][ 'reloadgx' ] = self:GetChecked( )
     ui:updateStats( 
       ui[ 'menu' ], 
@@ -444,9 +480,35 @@ function ui:createMenu( )
     )
   end )
 
-  self[ 'menu' ][ 'rlui' ]:SetChecked( persistence[ 'options' ][ 'reloadui' ] or false )
-  self[ 'menu' ][ 'rlui' ]:SetScript( 'OnClick', function( self )
+  local rlui = frames:createCheckbox( self[ 'menu' ][ 'containers' ][ 2 ], 'Reload UI', 'rlui' )
+  rlui:SetSize( 25, 25 )
+  rlui:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
+  local t = frames:createText( self[ 'menu' ][ 'containers' ][ 2 ], 'some settings require a full reload of your ui', 9, 'warn' )
+  t:SetPoint( 'topleft', rlui, 'bottomleft', 0, 0 )
+  t:SetSize( ( self[ 'menu' ][ 'containers' ][ 2 ]:GetWidth( ) / 2 ) - 5, 20 )
+
+  rlui:SetChecked( persistence[ 'options' ][ 'reloadui' ] or false )
+  rlui:SetScript( 'OnClick', function( self )
     persistence[ 'options' ][ 'reloadui' ] = self:GetChecked( )
+    ui:updateStats( 
+      ui[ 'menu' ], 
+      ui[ 'registry' ][ 'vars_count' ], 
+      ui[ 'registry' ][ 'tracked_count' ], 
+      'done' 
+    )
+  end )
+
+  local csui = frames:createCheckbox( self[ 'menu' ][ 'containers' ][ 2 ], 'Cloud Sync', 'csui' )
+  csui:SetSize( 25, 25 )
+  csui:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
+  local t = frames:createText( self[ 'menu' ][ 'containers' ][ 2 ], 'save modifications to Blizzard servers', 9, 'warn' )
+  t:SetPoint( 'topleft', csui, 'bottomleft', 0, 0 )
+  t:SetSize( ( self[ 'menu' ][ 'containers' ][ 2 ]:GetWidth( ) / 2 ) - 5, 20 )
+
+  csui:SetChecked( persistence[ 'options' ][ 'cloudsync' ] or false )
+  csui:SetScript( 'OnClick', function( self )
+    persistence[ 'options' ][ 'cloudsync' ] = self:GetChecked( )
+    tracked:cloudSync( persistence[ 'options' ][ 'cloudsync' ] )
     ui:updateStats( 
       ui[ 'menu' ], 
       ui[ 'registry' ][ 'vars_count' ], 

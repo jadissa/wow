@@ -136,7 +136,8 @@ function tracked:queueConfig( category, var, value )
 
 end
 
--- update configuration
+-- update system
+-- CVar and stats application
 --
 -- returns bool, number, string
 function tracked:applyConfig( category )
@@ -202,12 +203,32 @@ function tracked:applyConfig( category )
 
 end
 
+-- mark config rows as modified/tracked or not
+-- 
+-- return string
 function tracked:indicate( value )
   if value == true then 
     return 'modified' 
   else 
     return 'default' 
   end
+end
+
+-- toggle synch to blizz hq
+-- 
+-- return bool
+function tracked:cloudSync( state )
+
+  local current_state = GetCVar( 'synchronizeConfig' )
+  if state ~= current_state then
+    SetCVar( 'synchronizeConfig', state )
+    if GetCVar( 'synchronizeConfig' ) ~= state then
+      return false
+    else 
+      return true
+    end
+  end
+
 end
 
 -- setup tracking
@@ -235,6 +256,7 @@ function tracked:OnInitialize( )
   defaults[ 'profile' ][ 'options' ]  = { }
   defaults[ 'profile' ][ 'options' ][ 'reloadgx' ]  = true
   defaults[ 'profile' ][ 'options' ][ 'reloadui' ]  = false
+  defaults[ 'profile' ][ 'options' ][ 'cloudsync' ] = true
 
   self:_geParenttDB( ):RegisterNamespace(
   	self:GetName( ), defaults

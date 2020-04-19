@@ -50,6 +50,23 @@ end
 function frames:bootUI( )
 
   local f = self:createFrame( 'Frame', vars:GetName( ) .. 'Main', UIParent, 'UIPanelDialogTemplate' )
+
+  f:SetFrameStrata( 'MEDIUM' )
+  f:SetScript( 'OnMouseDown', function( self ) 
+
+    if self:GetFrameStrata() == 'MEDIUM' then
+      self:SetFrameStrata( 'HIGH' )
+    end
+
+  end )
+  f:SetScript( 'OnLeave', function( self ) 
+    
+    if self:GetFrameStrata() == 'HIGH' then
+      self:SetFrameStrata( 'MEDIUM' )
+    end
+
+  end )
+
   f:SetFrameStrata( 'HIGH' )
   f:SetClampedToScreen( true )
   f:SetSize( 700, 400 )
@@ -210,32 +227,6 @@ function frames:bootUI( )
       self:GetParent( )[ 'x' ], self:GetParent( )[ 'y' ] = tx, ty
     end
   end )
-
-  f[ 'dbwipe' ] = frames:createButton( f[ 'containers' ][ 2 ], 'Database Wipe', 'dbwipe' )
-  f[ 'dbwipe' ]:SetSize( 125, 25 )
-  f[ 'dbwipe' ]:SetPoint( 'topleft', f[ 'browser' ], 'topleft', 10, -10 )
-  local t = self:createText( f[ 'containers' ][ 2 ], 'You can use this if your configuration becomes corrupt. your modifications to game settings will persist. all configurations are repulled from Warcaft for a fresh DB', 9, 'warn' )
-  t:SetPoint( 'topleft', f[ 'dbwipe' ], 'bottomleft', 0, 0 )
-  t:SetSize( f:GetWidth( ) - 30, 20 )
-
-  f[ 'defaults' ] = frames:createButton( f[ 'containers' ][ 2 ], 'Reset to Defaults', 'defaults' )
-  f[ 'defaults' ]:SetSize( 125, 25 )
-  f[ 'defaults' ]:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
-  local t = self:createText( f[ 'containers' ][ 2 ], 'WARNING! this resets your game configuration back to Blizzard default state', 9, 'warn' )
-  t:SetPoint( 'topleft', f[ 'defaults' ], 'bottomleft', 0, 0 )
-  t:SetSize( f:GetWidth( ) - 30, 20 )
-
-  f[ 'rlgx' ] = frames:createCheckbox( f[ 'containers' ][ 2 ], 'Reload Graphics', 'rlgx' )
-  f[ 'rlgx' ]:SetSize( 25, 25 )
-  f[ 'rlgx' ]:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
-  local t = self:createText( f[ 'containers' ][ 2 ], 'Some settings may only require a reload of your graphics', 8, 'warn' )
-  t:SetPoint( 'topleft', f[ 'rlgx' ], 'bottomleft', 0, 0 )
-
-  f[ 'rlui' ] = frames:createCheckbox( f[ 'containers' ][ 2 ], 'Reload UI', 'rlui' )
-  f[ 'rlui' ]:SetSize( 25, 25 )
-  f[ 'rlui' ]:SetPoint( 'topleft', t, 'bottomleft', 0, -10 )
-  local t = self:createText( f[ 'containers' ][ 2 ], 'Some settings require a full reload of your ui', 8, 'warn' )
-  t:SetPoint( 'topleft', f[ 'rlui' ], 'bottomleft', 0, 0 )
 
   f:Hide( )
 
