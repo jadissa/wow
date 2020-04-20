@@ -9,8 +9,8 @@
 ## Notes: Manages CVar Data
 ## X-Category: System
 # /run print((select(4, GetBuildInfo())));
-## X-Version: 11303
-## Interface: 11303
+## X-Version: 11304
+## Interface: 11304
 
 # Includes
 libs\AceDB-3.0\AceDB-3.0.xml
