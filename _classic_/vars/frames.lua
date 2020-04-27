@@ -51,22 +51,6 @@ function frames:bootUI( )
 
   local f = self:createFrame( 'Frame', vars:GetName( ) .. 'Main', UIParent, 'UIPanelDialogTemplate' )
 
-  f:SetFrameStrata( 'MEDIUM' )
-  f:SetScript( 'OnMouseDown', function( self ) 
-
-    if self:GetFrameStrata() == 'MEDIUM' then
-      self:SetFrameStrata( 'HIGH' )
-    end
-
-  end )
-  f:SetScript( 'OnLeave', function( self ) 
-    
-    if self:GetFrameStrata() == 'HIGH' then
-      self:SetFrameStrata( 'MEDIUM' )
-    end
-
-  end )
-
   f:SetFrameStrata( 'HIGH' )
   f:SetClampedToScreen( true )
   f:SetSize( 700, 400 )
