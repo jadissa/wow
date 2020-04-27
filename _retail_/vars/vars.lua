@@ -1,6 +1,6 @@
  -------------------------------------
 -- vars --------------
--- Emerald Dream --------
+-- Emerald Dream/Grobbulus --------
 
 -- 
 utility   = LibStub:GetLibrary( 'utility' )
