@@ -1,5 +1,5 @@
-## Author: fórsákén
-## X-Realm: Emerald Dream
+## Author: jadissa
+## X-Realm: Emerald Dream/Grobbulus
 ## X-Website: https://github.com/jadissa/wow/_classic_/vars
 
 ## DefaultState: enabled

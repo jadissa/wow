@@ -1,6 +1,6 @@
  -------------------------------------
--- jvars --------------
--- fórsákén,  Emerald Dream --------
+-- vars --------------
+-- Emerald Dream/Grobbulus --------
 
 -- 
 local vars = LibStub( 'AceAddon-3.0' ):GetAddon( 'vars' )

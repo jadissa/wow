@@ -1,6 +1,6 @@
  -------------------------------------
--- jvars --------------
--- fórsákén,  Emerald Dream --------
+-- vars --------------
+-- Emerald Dream/Grobbulus --------
 
 -- 
 utility   = LibStub:GetLibrary( 'utility' )
